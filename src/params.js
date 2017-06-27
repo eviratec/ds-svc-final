@@ -17,14 +17,19 @@ module.exports = function (dataStudio) {
       return next();
     }
 
-    req.auth = req.headers["authorization"];
-
-    db.fetchTokenByKey(req.auth)
+    db.fetchTokenByKey(req.headers["authorization"])
       .then(function (token) {
+
+        if (!token) {
+          return next();
+        }
+
         req.authorized = true;
         req.authUser = token.related("User");
         req.authToken = token;
+
         next();
+
       })
       .catch(function (err) {
         console.log(err);
@@ -33,7 +38,24 @@ module.exports = function (dataStudio) {
 
   });
 
+  api.param("appId", function (req, res, next, id) {
+
+    req.appModel = null;
+
+    db.fetchAppById(id)
+      .then(function (app) {
+        req.appModel = app;
+        next();
+      })
+      .catch(function (err) {
+        next();
+      });
+
+  });
+
   api.param("userId", function (req, res, next, id) {
+
+    req.user = null;
 
     db.fetchUserById(id)
       .then(function (user) {
@@ -41,13 +63,14 @@ module.exports = function (dataStudio) {
         next();
       })
       .catch(function (err) {
-        req.user = null;
         next();
       });
 
   });
 
   api.param("authAttemptId", function (req, res, next, id) {
+
+    req.authAttempt = null;
 
     db.fetchAuthAttemptById(id)
       .then(function (authAttempt) {
@@ -56,7 +79,6 @@ module.exports = function (dataStudio) {
       })
       .catch(function (err) {
         console.log(err);
-        req.authAttempt = null;
         next();
       });
 

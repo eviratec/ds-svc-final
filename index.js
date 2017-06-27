@@ -24,6 +24,12 @@ const dataStudio = new DataStudio();
 const api = dataStudio.expressApp;
 const crypt = dataStudio.bcrypt;
 
+function requireAuthorization (req, res, next) {
+  if (!req.authorized) {
+    return res.send(403);
+  }
+  next();
+}
 
 api.post("/auth/attempts", function (req, res) {
 
@@ -101,6 +107,47 @@ api.get("/user/:userId", function (req, res) {
     return res.send(404);
   }
   res.send(200, req.user);
+});
+
+api.post("/apps", requireAuthorization, function (req, res) {
+  let db = dataStudio.db;
+  let App = db.App;
+  let newAppId = v4uuid();
+  let newApp = new App({
+    Id: newAppId,
+    UserId: req.authUser.get("Id"),
+    Name: req.body.Name || "Un-named App",
+    Created: Math.floor(Date.now()/1000),
+  });
+  newApp.save()
+    .then(function (app) {
+      res.send(303, `/app/${newAppId}`);
+    })
+    .catch(function (err) {
+      res.send(400, { ErrorMsg: err.message });
+    });
+});
+
+api.get("/app/:appId", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  res.send(200, req.appModel);
+});
+
+api.del("/app/:appId", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  req.appModel.save({"Deleted": Math.floor(Date.now()/1000)}, {patch: true})
+    .then(function () {
+      res.send(204);
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.send(500);
+    });
+
 });
 
 api.get("/apps/all", function (req, res) {

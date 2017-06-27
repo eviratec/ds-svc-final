@@ -17,10 +17,22 @@ module.exports = function (dataStudio) {
 
   var Hash = bookshelf.Model.extend({
     tableName: 'hashes',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
   });
 
   var App = bookshelf.Model.extend({
     tableName: 'apps',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
     User: function() {
       return this.belongsTo(bookshelf.Model("User"), "UserId", "Id");
     }
@@ -28,6 +40,12 @@ module.exports = function (dataStudio) {
 
   var User = bookshelf.Model.extend({
     tableName: 'users',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
     Apps: function() {
       return this.hasMany(App, "Id", "UserId");
     },
@@ -35,6 +53,12 @@ module.exports = function (dataStudio) {
 
   var Token = bookshelf.Model.extend({
     tableName: 'tokens',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
     User: function() {
       return this.hasOne(User, "Id", "UserId");
     },
@@ -42,6 +66,12 @@ module.exports = function (dataStudio) {
 
   var AuthAttempt = bookshelf.Model.extend({
     tableName: 'auth_attempts',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
     Token: function() {
       return this.hasOne(Token, "Id", "TokenId");
     },
@@ -57,7 +87,7 @@ module.exports = function (dataStudio) {
     AuthAttempt: AuthAttempt,
     fetchUserById: function (id) {
       return new Promise((resolve, reject) => {
-        User.where("Id", id)
+        User.where({"Id": id})
           .fetch()
           .then(resolve)
           .catch(reject);
@@ -65,7 +95,7 @@ module.exports = function (dataStudio) {
     },
     fetchUserByLogin: function (login) {
       return new Promise((resolve, reject) => {
-        User.where("Login", login.toLowerCase())
+        User.where({"Login": login.toLowerCase()})
           .fetch()
           .then(resolve)
           .catch(reject);
@@ -73,7 +103,15 @@ module.exports = function (dataStudio) {
     },
     fetchHashByOwnerId: function (id) {
       return new Promise((resolve, reject) => {
-        Hash.where("OwnerId", id)
+        Hash.where({"OwnerId": id})
+          .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+    fetchAppById: function (id) {
+      return new Promise((resolve, reject) => {
+        App.where({"Id": id})
           .fetch()
           .then(resolve)
           .catch(reject);
@@ -81,7 +119,7 @@ module.exports = function (dataStudio) {
     },
     fetchAppsByUserId: function (userId) {
       return new Promise((resolve, reject) => {
-        App.where("UserId", userId)
+        App.where({"UserId": userId, "Deleted": null})
           .fetchAll()
           .then(resolve)
           .catch(reject);
@@ -89,7 +127,7 @@ module.exports = function (dataStudio) {
     },
     fetchAuthAttemptById: function (id) {
       return new Promise((resolve, reject) => {
-        AuthAttempt.where("Id", id)
+        AuthAttempt.where({"Id": id})
           .fetch({withRelated: ["Token"]})
           .then(resolve)
           .catch(reject);
@@ -97,16 +135,15 @@ module.exports = function (dataStudio) {
     },
     fetchTokenByKey: function (key) {
       return new Promise((resolve, reject) => {
-        Token.where("Key", key)
+        Token.where({"Key": key})
           .fetch({withRelated: ["User"]})
-          // .fetch()
           .then(resolve)
           .catch(reject);
       });
     },
     fetchTokenById: function (id) {
       return new Promise((resolve, reject) => {
-        Token.where("Id", id)
+        Token.where({"Id": id})
           .fetch({withRelated: ["User"]})
           .then(resolve)
           .catch(reject);
