@@ -30,15 +30,17 @@ module.exports = function (dataStudio) {
   var AuthAttempt = bookshelf.Model.extend({
     tableName: 'auth_attempts',
     Token: function() {
-      return this.hasOne(Token);
+      return this.hasOne(Token, "Id", "TokenId");
     },
   });
 
   return {
     _knex: knex,
     _bookshelf: bookshelf,
+    Hash: Hash,
     User: User,
     Token: Token,
+    AuthAttempt: AuthAttempt,
     fetchUserById: function (id) {
       return new Promise((resolve, reject) => {
         User.where("Id", id)

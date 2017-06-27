@@ -19,19 +19,76 @@ class DataStudio {
   }
 }
 
+const v4uuid = require("uuid/v4");
 const dataStudio = new DataStudio();
 const api = dataStudio.expressApp;
 const crypt = dataStudio.bcrypt;
 
+
 api.post("/auth/attempts", function (req, res) {
+
+  let db = dataStudio.db;
+  let AuthAttempt = db.AuthAttempt;
+  let Token = db.Token;
+
+  if (!req.body.Login || !req.body.Password) {
+    return res.send(400, { ErrorMsg: "ERR_INCOMPLETE: Missing Login or Password" })
+  }
+
+  let attemptId = v4uuid();
+
+  let attempt = new AuthAttempt({
+    Id: attemptId,
+    Login: req.body.Login,
+    Finished: false,
+    Error: null,
+    TokenId: null,
+    Created: new Date(),
+  });
+
+  function createToken (user, expiry) {
+    let tokenId = v4uuid();
+    let tsNow = Math.floor(Date.now()/1000);
+    let token = new Token({
+      Id: tokenId,
+      UserId: user.get("Id"),
+      Key: `${tokenId}/${user.get("Id")}/${tsNow}`,
+      Created: tsNow,
+      Expiry: expiry || 3600,
+    });
+    return token.save();
+  }
+
   verifyAuthN(req.body.Login, req.body.Password)
     .then(function (user) {
-      res.send(200, user);
-      // res.send(303, `/auth/attempt/${authAttempt.Id}`);
+
+      createToken(user, 86400)
+        .then(function (token) {
+          attempt.save({Finished: true, TokenId: token.get("Id")})
+            .then(function () {
+              res.send(303, `/auth/attempt/${attemptId}`);
+            })
+            .catch(function (err) {
+              console.log(err);
+              res.send(400, { ErrorMsg: err.message });
+            });
+        })
+        .catch(function (err) {
+          console.log(err);
+          res.send(400, { ErrorMsg: err.message });
+        });
     })
     .catch(function (err) {
       console.log(err);
-      res.send(400, { ErrorMsg: err.message });
+      attempt.Error = err.message;
+      attempt.Finished = true;
+      attempt.save({Finished: true, Error: err.message})
+        .then(function () {
+          res.send(400, { ErrorMsg: err.message });
+        })
+        .catch(function () {
+          res.send(400, { ErrorMsg: err.message });
+        });
     });
 });
 
@@ -56,7 +113,7 @@ function verifyAuthN (Login, Password) {
     const db = dataStudio.db;
 
     if (!Login || !Password) {
-      return reject(new Error("ERR_INCOMPLETE: Missing Login or Password"));
+      return reject(new Error());
     }
 
     db.fetchUserByLogin(Login)

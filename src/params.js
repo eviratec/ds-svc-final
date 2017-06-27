@@ -41,6 +41,7 @@ module.exports = function (dataStudio) {
         next();
       })
       .catch(function (err) {
+        console.log(err);
         req.authAttempt = null;
         next();
       });
