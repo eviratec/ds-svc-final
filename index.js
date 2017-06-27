@@ -164,6 +164,72 @@ api.get("/apps/all", function (req, res) {
     });
 });
 
+api.get("/app/:appId/schemas", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  let db = dataStudio.db;
+  db.fetchAppSchemasByAppId(req.appModel.get("Id"))
+    .then(function (schemas) {
+      res.send(200, schemas);
+    })
+    .catch(function (err) {
+      res.send(500, { ErrorMsg: err.message });
+    });
+});
+
+api.post("/app/:appId/schemas", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  let db = dataStudio.db;
+  let AppSchema = db.AppSchema;
+  let appId = req.appModel.get("Id");
+  let newAppSchemaId = v4uuid();
+  let newAppSchema = new AppSchema({
+    Id: newAppSchemaId,
+    AppId: appId,
+    Name: req.body.Name || "NewSchema",
+    Ref: req.body.Ref || "#" + req.body.Name,
+    Created: Math.floor(Date.now()/1000),
+  });
+  newAppSchema.save()
+    .then(function (appSchema) {
+      res.send(303, `/app/${appId}/schema/${appSchema.get("Id")}`);
+    })
+    .catch(function (err) {
+      res.send(400, { ErrorMsg: err.message });
+    });
+});
+
+api.del("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  if (req.appSchemaModel.get("AppId") !== req.appModel.get("Id")) {
+    return res.send(400);
+  }
+  req.appSchemaModel.save({"Deleted": Math.floor(Date.now()/1000)}, {patch: true})
+    .then(function () {
+      res.send(204);
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.send(500);
+    });
+
+});
+
+api.get("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  if (req.appSchemaModel.get("AppId") !== req.appModel.get("Id")) {
+    return res.send(400);
+  }
+  res.send(200, req.appSchemaModel);
+});
+
 api.listen(3000, function () {
   console.log("Example app listening on port 3000!")
 });

@@ -25,6 +25,19 @@ module.exports = function (dataStudio) {
     },
   });
 
+  var AppSchema = bookshelf.Model.extend({
+    tableName: 'app_schemas',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
+    App: function() {
+      return this.belongsTo(bookshelf.Model("User"), "AppId", "Id");
+    },
+  });
+
   var App = bookshelf.Model.extend({
     tableName: 'apps',
     constructor: function() {
@@ -35,7 +48,10 @@ module.exports = function (dataStudio) {
     },
     User: function() {
       return this.belongsTo(bookshelf.Model("User"), "UserId", "Id");
-    }
+    },
+    AppSchemas: function() {
+      return this.hasMany(AppSchema, "Id", "UserId");
+    },
   });
 
   var User = bookshelf.Model.extend({
@@ -81,6 +97,7 @@ module.exports = function (dataStudio) {
     _knex: knex,
     _bookshelf: bookshelf,
     App: App,
+    AppSchema: AppSchema,
     Hash: Hash,
     User: User,
     Token: Token,
@@ -105,6 +122,22 @@ module.exports = function (dataStudio) {
       return new Promise((resolve, reject) => {
         Hash.where({"OwnerId": id})
           .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+    fetchAppSchemaById: function (id) {
+      return new Promise((resolve, reject) => {
+        AppSchema.where({"Id": id})
+          .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+    fetchAppSchemasByAppId: function (appId) {
+      return new Promise((resolve, reject) => {
+        AppSchema.where({"AppId": appId, "Deleted": null})
+          .fetchAll()
           .then(resolve)
           .catch(reject);
       });

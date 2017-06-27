@@ -53,6 +53,21 @@ module.exports = function (dataStudio) {
 
   });
 
+  api.param("appSchemaId", function (req, res, next, id) {
+
+    req.appSchemaModel = null;
+
+    db.fetchAppSchemaById(id)
+      .then(function (schema) {
+        req.appSchemaModel = schema;
+        next();
+      })
+      .catch(function (err) {
+        next();
+      });
+
+  });
+
   api.param("userId", function (req, res, next, id) {
 
     req.user = null;
