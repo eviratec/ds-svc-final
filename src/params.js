@@ -7,15 +7,29 @@ module.exports = function (dataStudio) {
 
   api.use(function (req, res, next) {
 
+    let authPt;
+
+    req.authorized = false;
+    req.authUser = null;
+    req.authToken = null;
+
     if (!req.headers["authorization"]) {
-      req.authorized = false;
       return next();
     }
 
     req.auth = req.headers["authorization"];
-    console.log(req.auth);
 
-    next();
+    db.fetchTokenByKey(req.auth)
+      .then(function (token) {
+        req.authorized = true;
+        req.authUser = token.related("User");
+        req.authToken = token;
+        next();
+      })
+      .catch(function (err) {
+        console.log(err);
+        next();
+      });
 
   });
 

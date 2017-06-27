@@ -9,8 +9,8 @@ module.exports = function (dataStudio) {
       user: 'root',
       password: 'password',
       database: 'datastudio',
-      charset: 'utf8'
-    }
+      charset: 'utf8',
+    },
   });
 
   const bookshelf = require('bookshelf')(knex);
@@ -19,12 +19,25 @@ module.exports = function (dataStudio) {
     tableName: 'hashes',
   });
 
+  var App = bookshelf.Model.extend({
+    tableName: 'apps',
+    User: function() {
+      return this.belongsTo(bookshelf.Model("User"), "UserId", "Id");
+    }
+  });
+
   var User = bookshelf.Model.extend({
     tableName: 'users',
+    Apps: function() {
+      return this.hasMany(App, "Id", "UserId");
+    },
   });
 
   var Token = bookshelf.Model.extend({
-    tableName: 'tokens'
+    tableName: 'tokens',
+    User: function() {
+      return this.hasOne(User, "Id", "UserId");
+    },
   });
 
   var AuthAttempt = bookshelf.Model.extend({
@@ -37,6 +50,7 @@ module.exports = function (dataStudio) {
   return {
     _knex: knex,
     _bookshelf: bookshelf,
+    App: App,
     Hash: Hash,
     User: User,
     Token: Token,
@@ -65,6 +79,14 @@ module.exports = function (dataStudio) {
           .catch(reject);
       });
     },
+    fetchAppsByUserId: function (userId) {
+      return new Promise((resolve, reject) => {
+        App.where("UserId", userId)
+          .fetchAll()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
     fetchAuthAttemptById: function (id) {
       return new Promise((resolve, reject) => {
         AuthAttempt.where("Id", id)
@@ -73,10 +95,19 @@ module.exports = function (dataStudio) {
           .catch(reject);
       });
     },
+    fetchTokenByKey: function (key) {
+      return new Promise((resolve, reject) => {
+        Token.where("Key", key)
+          .fetch({withRelated: ["User"]})
+          // .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
     fetchTokenById: function (id) {
       return new Promise((resolve, reject) => {
         Token.where("Id", id)
-          .fetch()
+          .fetch({withRelated: ["User"]})
           .then(resolve)
           .catch(reject);
       });

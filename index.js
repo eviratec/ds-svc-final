@@ -103,6 +103,20 @@ api.get("/user/:userId", function (req, res) {
   res.send(200, req.user);
 });
 
+api.get("/apps/all", function (req, res) {
+  if (!req.authorized) {
+    return res.send(200, []);
+  }
+  let db = dataStudio.db;
+  db.fetchAppsByUserId(req.authUser.get("Id"))
+    .then(function (apps) {
+      res.send(200, apps);
+    })
+    .catch(function (err) {
+      res.send(500, { ErrorMsg: err.message });
+    });
+});
+
 api.listen(3000, function () {
   console.log("Example app listening on port 3000!")
 });
