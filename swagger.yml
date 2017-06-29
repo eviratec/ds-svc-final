@@ -411,6 +411,7 @@ definitions:
         type: string
         format: uuid
       Key:
+        description: "To be used as the `Authorization` value with API requests which require authorization."
         type: string
       Expiry:
         description: "The number of seconds this `Token` is considered valid for after it's creation."
