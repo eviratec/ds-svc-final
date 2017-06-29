@@ -5,10 +5,10 @@ module.exports = function (dataStudio) {
   const knex = require('knex')({
     client: 'mysql',
     connection: {
-      host: '127.0.0.1',
-      user: 'root',
-      password: 'password',
-      database: 'datastudio',
+      host: process.env.DS_DB_HOST,
+      user: process.env.DS_DB_USER,
+      password: process.env.DS_DB_PASS,
+      database: process.env.DS_DB_NAME,
       charset: 'utf8',
     },
   });
