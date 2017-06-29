@@ -1,0 +1,472 @@
+swagger: "2.0"
+info:
+  title: "DataStudio Auth+User API"
+  description: "DataStudio v1 Combination (Auth+User) REST API"
+  version: "1.0.0"
+  termsOfService: "http://datastudio.eviratec.software/api/v1/terms"
+  contact:
+    email: "info@eviratec.co"
+  license:
+    name: "DataStudio API v1 License"
+    url: "http://datastudio.eviratec.software/api/v1/license"
+host: "api.datastudio.eviratec.software"
+basePath: "/"
+tags:
+- name: "authAttempt"
+  description: "Login and authorization"
+- name: "user"
+  description: "User information"
+- name: "app"
+  description: "Manage and fetch Apps"
+- name: "appSchema"
+  description: "Manage and fetch App Schemas"
+schemes:
+- "https"
+- "http"
+paths:
+  "/auth/attempts":
+    post:
+      summary: ""
+      description: |
+        Create an AuthAttempt (aka login with `Credentials`)
+        Attributes `Login` and `Password` are required in the request body, with a successful response indicated by HTTP/1.1 303 See Other.  The `Token` can be retreived via the URI in the Location response header.
+      operationId: "createAuthAttempt"
+      tags:
+      - "authAttempt"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "A `Credentials` model"
+        required: true
+        schema:
+          $ref: "#/definitions/Credentials"
+      responses:
+        303:
+          description: "See Other"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/auth/attempt/{authAttemptId}":
+    get:
+      summary: ""
+      description: ""
+      operationId: "getAuthAttemptById"
+      tags:
+      - "authAttempt"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "authAttemptId"
+        description: "An `AuthAttempt` `ID`"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK/Success"
+          schema:
+            $ref: "#/definitions/AuthAttempt"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/user/{userId}":
+    get:
+      summary: ""
+      description: ""
+      operationId: "getUserById"
+      tags:
+      - "user"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "userId"
+        description: "User ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK/Success"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/apps":
+    post:
+      summary: ""
+      description: |
+        Create an App.
+        As per RFC7231 section [4.3.3](https://tools.ietf.org/html/rfc7231#section-4.3.3) - on *success* returns HTTP/1.1 303 See Other with the newly created resource's URI in the `Location` field.
+      operationId: "createApp"
+      tags:
+      - "app"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "An `App` model"
+        required: true
+        schema:
+          $ref: "#/definitions/NewApp"
+      responses:
+        303:
+          description: "See Other"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/app/{appId}":
+    get:
+      summary: ""
+      description: ""
+      operationId: "getAppById"
+      tags:
+      - "app"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "appId"
+        description: "App ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK/Success"
+          schema:
+            $ref: "#/definitions/App"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+    delete:
+      summary: ""
+      description: ""
+      operationId: "deleteAppById"
+      tags:
+      - "app"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "appId"
+        description: "App ID"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "OK/No Content"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/apps/all":
+    get:
+      summary: ""
+      description: ""
+      operationId: "getAllApps"
+      tags:
+      - "app"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "OK/Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/App"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/app/{appId}/schemas":
+    get:
+      summary: ""
+      description: ""
+      operationId: "getAppSchemas"
+      tags:
+      - "appSchema"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "appId"
+        description: "App ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK/Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/AppSchema"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+    post:
+      summary: ""
+      description: |
+        Create an AppSchema.
+        As per RFC7231 section [4.3.3](https://tools.ietf.org/html/rfc7231#section-4.3.3) - on *success* returns HTTP/1.1 303 See Other with the newly created resource's URI in the `Location` field.
+      operationId: "createAppSchema"
+      tags:
+      - "appSchema"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "A NewAppSchema model"
+        required: true
+        schema:
+          $ref: "#/definitions/NewAppSchema"
+      - in: "path"
+        name: "appId"
+        description: "App ID"
+        required: true
+        type: "string"
+      responses:
+        303:
+          description: "See Other"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+  "/app/{appId}/schema/{appSchemaId}":
+    delete:
+      summary: ""
+      description: ""
+      operationId: "deleteAppSchemaById"
+      tags:
+      - "appSchema"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "appId"
+        description: "App ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "path"
+        name: "appSchemaId"
+        description: "App Schema ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        204:
+          description: "OK/No Content"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+    get:
+      summary: ""
+      description: ""
+      operationId: "getAppSchemaById"
+      tags:
+      - "appSchema"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "appId"
+        description: "App ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "path"
+        name: "appSchemaId"
+        description: "App Schema ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "OK/Success"
+          schema:
+            $ref: "#/definitions/AppSchema"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not found"
+definitions:
+  Credentials:
+    type: object
+    properties:
+      Login:
+        type: string
+      Password:
+        type: string
+        format: password
+  AuthAttempt:
+    type: object
+    properties:
+      Id:
+        type: string
+        format: uuid
+      Login:
+        type: string
+      Finished:
+        type: boolean
+      Error:
+        type: string
+      TokenId:
+        type: string
+        format: uuid
+      Token:
+        $ref: "#/definitions/Token"
+  User:
+    type: object
+    properties:
+      Id:
+        type: string
+        format: uuid
+      Login:
+        type: string
+  Token:
+    type: object
+    properties:
+      Id:
+        type: string
+        format: uuid
+      UserId:
+        type: string
+        format: uuid
+      Key:
+        type: string
+      Expiry:
+        description: "The number of seconds this `Token` is considered valid for after it's creation."
+        type: number
+      Revoked:
+        type: number
+        description: "Seconds since epoch (Unix Timestamp) when the `Token` was revoked.  If this field contains any value other than `NULL`: the `Token` *has* been revoked and cannot be accepted by the API."
+      Created:
+        type: number
+        description: "Seconds since epoch (Unix Timestamp) when the `Token` was created.  This may be used with the Expiry to determine if a `Token` has expired."
+  App:
+    type: object
+    properties:
+      Id:
+        type: string
+        format: uuid
+      UserId:
+        type: string
+        format: uuid
+      Name:
+        type: string
+  NewApp:
+    type: object
+    properties:
+      Name:
+        type: string
+  Schema:
+    type: object
+    properties:
+      Id:
+        type: string
+        format: uuid
+      UserId:
+        type: string
+        format: uuid
+      Name:
+        type: string
+      Ref:
+        type: string
+  AppSchema:
+    type: object
+    properties:
+      Id:
+        type: string
+        format: uuid
+      AppId:
+        type: string
+        format: uuid
+      Name:
+        type: string
+      Ref:
+        type: string
+  NewAppSchema:
+    type: object
+    properties:
+      Name:
+        type: string
+      Ref:
+        type: string
