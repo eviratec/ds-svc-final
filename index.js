@@ -1,5 +1,8 @@
 "use strict";
 
+const CORS_ALLOW_ORIGINS = "*";
+const CORS_ALLOW_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+
 class DataStudio {
   constructor () {
 
@@ -11,6 +14,15 @@ class DataStudio {
     this.expressApp = express();
 
     this.expressApp.use(require("body-parser").json());
+
+    this.expressApp.use(function(req, res, next) {
+      res.header("Access-Control-Allow-Origin", CORS_ALLOW_ORIGINS);
+      res.header("Access-Control-Allow-Headers", CORS_ALLOW_HEADERS);
+      if ("options" !== req.method.toLowerCase()) {
+        return next();
+      }
+      res.send(200);
+    });
 
     this.db = require("./src/db")(this);
 
@@ -72,7 +84,8 @@ api.post("/auth/attempts", function (req, res) {
         .then(function (token) {
           attempt.save({Finished: true, TokenId: token.get("Id")})
             .then(function () {
-              res.send(303, `/auth/attempt/${attemptId}`);
+              res.setHeader('Location', `/auth/attempt/${attemptId}`);
+              res.send(303);
             })
             .catch(function (err) {
               console.log(err);
@@ -260,6 +273,7 @@ function verifyAuthN (Login, Password) {
 
       })
       .catch(function (err) {
+        console.log(err);
         reject(new Error("ERR_INVALID_LOGIN: Invalid Login"));
       });
 
