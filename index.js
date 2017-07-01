@@ -36,12 +36,56 @@ const dataStudio = new DataStudio();
 const api = dataStudio.expressApp;
 const crypt = dataStudio.bcrypt;
 
+const RESERVED_LOGINS = require("./src/etc/reserved.usernames.json");
+
 function requireAuthorization (req, res, next) {
   if (!req.authorized) {
     return res.send(403);
   }
   next();
 }
+
+function reservedLogin (Login) {
+  let login = Login.toLowerCase();
+  return RESERVED_LOGINS.indexOf(login) > -1;
+}
+
+api.get("/login/:login/availability", function (req, res) {
+
+  let Login = req.params.login;
+  let db = dataStudio.db;
+
+  if (Login.length < 5 || reservedLogin(Login)) {
+    return res.send(200, {
+      Login: Login,
+      Status: "UNAVAILABLE",
+    });
+  }
+
+  db.fetchUserByLogin(Login)
+    .then(function (user) {
+
+      if (!user) {
+        return res.send(200, {
+          Login: Login,
+          Status: "AVAILABLE",
+        });
+      }
+
+      res.send(200, {
+        Login: Login,
+        Status: "UNAVAILABLE",
+      });
+
+    })
+    .catch(function (err) {
+      res.send(200, {
+        Login: Login,
+        Status: "UNDETERMINED",
+      });
+    })
+
+});
 
 api.post("/auth/attempts", function (req, res) {
 
