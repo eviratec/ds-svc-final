@@ -1,8 +1,7 @@
-CREATE TABLE `app_schemas` (
+CREATE TABLE `app_apis` (
   `Id` varchar(36) NOT NULL,
   `AppId` varchar(36) NOT NULL,
   `Name` varchar(45) NOT NULL,
-  `Ref` varchar(255) NOT NULL,
   `Created` int(11) NOT NULL,
   `Deleted` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`),

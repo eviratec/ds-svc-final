@@ -50,6 +50,12 @@ function reservedLogin (Login) {
   return RESERVED_LOGINS.indexOf(login) > -1;
 }
 
+function pwHash (password) {
+  let crypt = datastudio.bcrypt;
+  var salt = crypt.genSaltSync(10);
+  return crypt.hashSync(password, salt);
+}
+
 api.get("/login/:login/availability", function (req, res) {
 
   let Login = req.params.login;
@@ -58,7 +64,8 @@ api.get("/login/:login/availability", function (req, res) {
   if (Login.length < 5 || reservedLogin(Login)) {
     return res.send(200, {
       Login: Login,
-      Status: "UNAVAILABLE",
+      Available: false,
+      Reason: "RESERVED",
     });
   }
 
@@ -68,24 +75,92 @@ api.get("/login/:login/availability", function (req, res) {
       if (!user) {
         return res.send(200, {
           Login: Login,
-          Status: "AVAILABLE",
+          Available: true,
         });
       }
 
       res.send(200, {
         Login: Login,
-        Status: "UNAVAILABLE",
+        Available: false,
       });
 
     })
     .catch(function (err) {
       res.send(200, {
         Login: Login,
-        Status: "UNDETERMINED",
+        Available: false,
       });
     })
 
 });
+
+// api.post("/signups", function (req, res) {
+//
+//   let db = dataStudio.db;
+//   let Signup = db.Signup;
+//
+//   let Email = req.body.Email.toLowerCase();
+//   let NewPassword = req.body.NewPassword;
+//
+//   let Login = Email;
+//
+//   let signupId = v4uuid();
+//   let signup = new Signup({
+//     Id: signupId,
+//     EmailAddress: Email,
+//     Login: Login,
+//     Created: Math.floor(Date.now()/1000),
+//   });
+//
+//   function createUser (Login) {
+//     return new Promise((resolve, reject) => {
+//       let userId = v4uuid();
+//       let user = new User({
+//         Id: userId,
+//         Login: Login,
+//         Created: Math.floor(Date.now()/1000),
+//       });
+//     });
+//   }
+//
+//   function createUserPassword (UserId, Password) {
+//     return new Promise((resolve, reject) => {
+//       let hashId = v4uuid();
+//       let hash = new Hash({
+//         Id: hashId,
+//         Value: pwhash(NewPassword),
+//         Owner: userId,
+//       });
+//     });
+//   }
+//
+//   function createToken (user, expiry) {
+//     let tokenId = v4uuid();
+//     let tsNow = Math.floor(Date.now()/1000);
+//     let token = new Token({
+//       Id: tokenId,
+//       UserId: user.get("Id"),
+//       Key: `${tokenId}/${user.get("Id")}/${tsNow}`,
+//       Created: tsNow,
+//       Expiry: expiry || 3600,
+//     });
+//     return token.save();
+//   }
+//
+//   db.signup(Email, NewPassword)
+//     .then(function (signup) {
+//       res.setHeader('Location', `/signup/${signup.Id}`);
+//       res.send(303);
+//     })
+//     .catch(function (err) {
+//       console.log(err);
+//       signup.save({
+//         Success: false,
+//         Error: err.message,
+//       })
+//     });
+//
+// });
 
 api.post("/auth/attempts", function (req, res) {
 
@@ -170,17 +245,20 @@ api.post("/apps", requireAuthorization, function (req, res) {
   let db = dataStudio.db;
   let App = db.App;
   let newAppId = v4uuid();
-  let newApp = new App({
+  let newApp = {
     Id: newAppId,
     UserId: req.authUser.get("Id"),
     Name: req.body.Name || "Un-named App",
     Created: Math.floor(Date.now()/1000),
-  });
-  newApp.save()
+  };
+  App.forge(newApp)
+    .save(null, {method:"insert"})
     .then(function (app) {
-      res.send(303, `/app/${newAppId}`);
+      res.setHeader('Location', `/app/${newAppId}`);
+      res.send(303);
     })
     .catch(function (err) {
+      console.log(err);
       res.send(400, { ErrorMsg: err.message });
     });
 });
@@ -189,7 +267,16 @@ api.get("/app/:appId", requireAuthorization, function (req, res) {
   if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
     return res.send(403);
   }
-  res.send(200, req.appModel);
+  let db = dataStudio.db;
+  db.fetchDetailedAppById(req.appModel.get("Id"))
+    .then(function (app) {
+      res.send(200, app);
+    })
+    .catch(function (err) {
+      res.send(400, {
+        Error: err.message,
+      });
+    });
 });
 
 api.del("/app/:appId", requireAuthorization, function (req, res) {
@@ -221,17 +308,77 @@ api.get("/apps/all", function (req, res) {
     });
 });
 
-api.get("/app/:appId/schemas", requireAuthorization, function (req, res) {
+
+[
+  {id: "schemas", fetch: "fetchAppSchemasByAppId"},
+  {id: "apis", fetch: "fetchAppApisByAppId"},
+  {id: "clients", fetch: "fetchAppClientsByAppId"},
+].forEach(x => {
+
+  let tId = x.id;
+  let tFn = x.fetch;
+
+  api.get(`/app/:appId/${tId}`, requireAuthorization, function (req, res) {
+    if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+      return res.send(403);
+    }
+    let db = dataStudio.db;
+    db[tFn](req.appModel.get("Id"))
+      .then(function (schemas) {
+        res.send(200, schemas);
+      })
+      .catch(function (err) {
+        res.send(500, { ErrorMsg: err.message });
+      });
+  });
+
+});
+
+api.post("/app/:appId/apis", requireAuthorization, function (req, res) {
   if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
     return res.send(403);
   }
   let db = dataStudio.db;
-  db.fetchAppSchemasByAppId(req.appModel.get("Id"))
-    .then(function (schemas) {
-      res.send(200, schemas);
+  let AppApi = db.AppApi;
+  let appId = req.appModel.get("Id");
+  let newAppApiId = v4uuid();
+  let newAppApi = new AppApi({
+    Id: newAppApiId,
+    AppId: appId,
+    Name: req.body.Name || "NewApi",
+    Created: Math.floor(Date.now()/1000),
+  });
+  newAppApi.save()
+    .then(function (appApi) {
+      res.setHeader('Location', `/app/${appId}/api/${appApi.get("Id")}`);
+      res.send(303);
     })
     .catch(function (err) {
-      res.send(500, { ErrorMsg: err.message });
+      res.send(400, { ErrorMsg: err.message });
+    });
+});
+
+api.post("/app/:appId/clients", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  let db = dataStudio.db;
+  let AppClient = db.AppClient;
+  let appId = req.appModel.get("Id");
+  let newAppClientId = v4uuid();
+  let newAppClient = new AppClient({
+    Id: newAppClientId,
+    AppId: appId,
+    Name: req.body.Name || "NewClient",
+    Created: Math.floor(Date.now()/1000),
+  });
+  newAppClient.save()
+    .then(function (appClient) {
+      res.setHeader('Location', `/app/${appId}/client/${appClient.get("Id")}`);
+      res.send(303);
+    })
+    .catch(function (err) {
+      res.send(400, { ErrorMsg: err.message });
     });
 });
 
@@ -252,7 +399,8 @@ api.post("/app/:appId/schemas", requireAuthorization, function (req, res) {
   });
   newAppSchema.save()
     .then(function (appSchema) {
-      res.send(303, `/app/${appId}/schema/${appSchema.get("Id")}`);
+      res.setHeader('Location', `/app/${appId}/schema/${appSchema.get("Id")}`);
+      res.send(303);
     })
     .catch(function (err) {
       res.send(400, { ErrorMsg: err.message });
@@ -275,6 +423,26 @@ api.del("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, 
       res.send(500);
     });
 
+});
+
+api.get("/app/:appId/api/:appApiId", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  if (req.appApiModel.get("AppId") !== req.appModel.get("Id")) {
+    return res.send(400);
+  }
+  res.send(200, req.appApiModel);
+});
+
+api.get("/app/:appId/client/:appClientId", requireAuthorization, function (req, res) {
+  if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
+    return res.send(403);
+  }
+  if (req.appClientModel.get("AppId") !== req.appModel.get("Id")) {
+    return res.send(400);
+  }
+  res.send(200, req.appClientModel);
 });
 
 api.get("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, res) {

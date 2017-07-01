@@ -48,6 +48,37 @@ module.exports = function (dataStudio) {
         next();
       })
       .catch(function (err) {
+        console.log(err);
+        next();
+      });
+
+  });
+
+  api.param("appApiId", function (req, res, next, id) {
+
+    req.appApiModel = null;
+
+    db.fetchAppApiById(id)
+      .then(function (appApi) {
+        req.appApiModel = appApi;
+        next();
+      })
+      .catch(function (err) {
+        next();
+      });
+
+  });
+
+  api.param("appClientId", function (req, res, next, id) {
+
+    req.appClientModel = null;
+
+    db.fetchAppClientById(id)
+      .then(function (appClient) {
+        req.appClientModel = appClient;
+        next();
+      })
+      .catch(function (err) {
         next();
       });
 
@@ -58,8 +89,8 @@ module.exports = function (dataStudio) {
     req.appSchemaModel = null;
 
     db.fetchAppSchemaById(id)
-      .then(function (schema) {
-        req.appSchemaModel = schema;
+      .then(function (appSchema) {
+        req.appSchemaModel = appSchema;
         next();
       })
       .catch(function (err) {

@@ -34,12 +34,39 @@ module.exports = function (dataStudio) {
       });
     },
     App: function() {
-      return this.belongsTo(bookshelf.Model("User"), "AppId", "Id");
+      return this.belongsTo(bookshelf.Model("App"), "AppId", "Id");
+    },
+  });
+
+  var AppApi = bookshelf.Model.extend({
+    tableName: 'app_apis',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
+    App: function() {
+      return this.belongsTo(bookshelf.Model("App"), "AppId", "Id");
+    },
+  });
+
+  var AppClient = bookshelf.Model.extend({
+    tableName: 'app_clients',
+    constructor: function() {
+      bookshelf.Model.apply(this, arguments);
+      this.on('saving', function(model, attrs, options) {
+        options.query.where('Id', '=', model.get("Id"));
+      });
+    },
+    App: function() {
+      return this.belongsTo(bookshelf.Model("App"), "AppId", "Id");
     },
   });
 
   var App = bookshelf.Model.extend({
     tableName: 'apps',
+    idAttribute: "Id",
     constructor: function() {
       bookshelf.Model.apply(this, arguments);
       this.on('saving', function(model, attrs, options) {
@@ -49,8 +76,14 @@ module.exports = function (dataStudio) {
     User: function() {
       return this.belongsTo(bookshelf.Model("User"), "UserId", "Id");
     },
-    AppSchemas: function() {
-      return this.hasMany(AppSchema, "Id", "UserId");
+    Schemas: function() {
+      return this.hasMany(AppSchema, "AppId");
+    },
+    Clients: function() {
+      return this.hasMany(AppClient, "AppId");
+    },
+    Apis: function() {
+      return this.hasMany(AppApi, "AppId");
     },
   });
 
@@ -97,6 +130,8 @@ module.exports = function (dataStudio) {
     _knex: knex,
     _bookshelf: bookshelf,
     App: App,
+    AppApi: AppApi,
+    AppClient: AppClient,
     AppSchema: AppSchema,
     Hash: Hash,
     User: User,
@@ -126,6 +161,22 @@ module.exports = function (dataStudio) {
           .catch(reject);
       });
     },
+    fetchAppApiById: function (id) {
+      return new Promise((resolve, reject) => {
+        AppApi.where({"Id": id})
+          .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+    fetchAppClientById: function (id) {
+      return new Promise((resolve, reject) => {
+        AppClient.where({"Id": id})
+          .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
     fetchAppSchemaById: function (id) {
       return new Promise((resolve, reject) => {
         AppSchema.where({"Id": id})
@@ -142,10 +193,34 @@ module.exports = function (dataStudio) {
           .catch(reject);
       });
     },
+    fetchAppClientsByAppId: function (appId) {
+      return new Promise((resolve, reject) => {
+        AppClient.where({"AppId": appId, "Deleted": null})
+          .fetchAll()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+    fetchAppApisByAppId: function (appId) {
+      return new Promise((resolve, reject) => {
+        AppApi.where({"AppId": appId, "Deleted": null})
+          .fetchAll()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
     fetchAppById: function (id) {
       return new Promise((resolve, reject) => {
         App.where({"Id": id})
           .fetch()
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+    fetchDetailedAppById: function (id) {
+      return new Promise((resolve, reject) => {
+        App.where({"Id": id})
+          .fetch({withRelated: ["Apis", "Clients", "Schemas"]})
           .then(resolve)
           .catch(reject);
       });
