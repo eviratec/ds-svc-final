@@ -1,6 +1,6 @@
 CREATE TABLE `signups` (
   `Id` varchar(36) NOT NULL,
-  `NewUserId` varchar(255) NULL,
+  `NewUserId` varchar(36) NULL,
   `EmailAddress` varchar(255) NULL,
   `Login` varchar(128) NULL,
   `Success` tinyint(4) NOT NULL,

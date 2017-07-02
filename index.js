@@ -51,116 +51,149 @@ function reservedLogin (Login) {
 }
 
 function pwHash (password) {
-  let crypt = datastudio.bcrypt;
+  let crypt = dataStudio.bcrypt;
   var salt = crypt.genSaltSync(10);
   return crypt.hashSync(password, salt);
 }
 
+function checkLoginAvailability (Login) {
+  return new Promise((resolve, reject) => {
+    let db = dataStudio.db;
+
+    if (Login.length < 5 || reservedLogin(Login)) {
+      return reject({
+        Login: Login,
+        Available: false,
+        Reason: "RESERVED",
+      });
+    }
+
+    db.fetchUserByLogin(Login)
+      .then(function (user) {
+
+        if (!user) {
+          return resolve({
+            Login: Login,
+            Available: true,
+          });
+        }
+
+        reject({
+          Login: Login,
+          Available: false,
+        });
+
+      })
+      .catch(function (err) {
+        reject({
+          Login: Login,
+          Available: false,
+        });
+      });
+  });
+}
+
 api.get("/login/:login/availability", function (req, res) {
 
-  let Login = req.params.login;
-  let db = dataStudio.db;
+  let Login = req.params.login.toLowerCase();
 
-  if (Login.length < 5 || reservedLogin(Login)) {
-    return res.send(200, {
-      Login: Login,
-      Available: false,
-      Reason: "RESERVED",
+  checkLoginAvailability(Login)
+    .then(function (r) {
+      res.send(200, r);
+    })
+    .catch(function () {
+      res.send(200, r);
     });
-  }
-
-  db.fetchUserByLogin(Login)
-    .then(function (user) {
-
-      if (!user) {
-        return res.send(200, {
-          Login: Login,
-          Available: true,
-        });
-      }
-
-      res.send(200, {
-        Login: Login,
-        Available: false,
-      });
-
-    })
-    .catch(function (err) {
-      res.send(200, {
-        Login: Login,
-        Available: false,
-      });
-    })
 
 });
 
-// api.post("/signups", function (req, res) {
-//
-//   let db = dataStudio.db;
-//   let Signup = db.Signup;
-//
-//   let Email = req.body.Email.toLowerCase();
-//   let NewPassword = req.body.NewPassword;
-//
-//   let Login = Email;
-//
-//   let signupId = v4uuid();
-//   let signup = new Signup({
-//     Id: signupId,
-//     EmailAddress: Email,
-//     Login: Login,
-//     Created: Math.floor(Date.now()/1000),
-//   });
-//
-//   function createUser (Login) {
-//     return new Promise((resolve, reject) => {
-//       let userId = v4uuid();
-//       let user = new User({
-//         Id: userId,
-//         Login: Login,
-//         Created: Math.floor(Date.now()/1000),
-//       });
-//     });
-//   }
-//
-//   function createUserPassword (UserId, Password) {
-//     return new Promise((resolve, reject) => {
-//       let hashId = v4uuid();
-//       let hash = new Hash({
-//         Id: hashId,
-//         Value: pwhash(NewPassword),
-//         Owner: userId,
-//       });
-//     });
-//   }
-//
-//   function createToken (user, expiry) {
-//     let tokenId = v4uuid();
-//     let tsNow = Math.floor(Date.now()/1000);
-//     let token = new Token({
-//       Id: tokenId,
-//       UserId: user.get("Id"),
-//       Key: `${tokenId}/${user.get("Id")}/${tsNow}`,
-//       Created: tsNow,
-//       Expiry: expiry || 3600,
-//     });
-//     return token.save();
-//   }
-//
-//   db.signup(Email, NewPassword)
-//     .then(function (signup) {
-//       res.setHeader('Location', `/signup/${signup.Id}`);
-//       res.send(303);
-//     })
-//     .catch(function (err) {
-//       console.log(err);
-//       signup.save({
-//         Success: false,
-//         Error: err.message,
-//       })
-//     });
-//
-// });
+api.get("/signup/:signupId", function (req, res) {
+  if (req.signup) {
+    res.send(200, req.signup);
+    return;
+  }
+  res.send(404);
+});
+
+function checkUsernameAvailability (req, res, next) {
+  checkLoginAvailability(req.body.Email.toLowerCase())
+    .then(function () {
+      next();
+    })
+    .catch(function () {
+      res.send(400, { ErrorMsg: 'Login/email unavailable' });
+    });
+}
+
+api.post("/signups", checkUsernameAvailability, function (req, res) {
+
+  let db = dataStudio.db;
+  let User = db.User;
+  let Hash = db.Hash;
+
+  let Email = req.body.Email.toLowerCase();
+  let NewPassword = pwHash(req.body.NewPassword);
+
+  let Login = Email;
+
+  let tsNow = Math.floor(Date.now()/1000);
+
+  let user;
+  let hash;
+
+  let userId = v4uuid();
+  let hashId = v4uuid();
+
+  createUserAndHash();
+
+  function createUser () {
+    return new Promise((resolve, reject) => {
+      user = new User({
+        Id: userId,
+        Login: Login,
+        Created: tsNow,
+      });
+      user.save()
+        .then(function () {
+          resolve(user);
+        })
+        .catch(reject);
+    });
+  }
+
+  function createUserPassword () {
+    return new Promise((resolve, reject) => {
+      hash = new Hash({
+        Id: hashId,
+        Value: NewPassword,
+        OwnerId: userId,
+      });
+      hash.save()
+        .then(function () {
+          resolve(hash);
+        })
+        .catch(reject);
+    });
+  }
+
+  function createUserAndHash () {
+    Promise
+      .all([
+        createUserPassword(),
+        createUser(),
+      ])
+      .then(function () {
+        res.send(202);
+      })
+      .catch(handleErr);
+  }
+
+  function handleErr (err) {
+    let msg = err.message;
+    res.send(400, { ErrorMsg: msg });
+  }
+
+});
 
 api.post("/auth/attempts", function (req, res) {
 
