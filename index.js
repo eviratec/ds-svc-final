@@ -2,13 +2,13 @@
 
 const DataStudio = require("./src/app");
 
-module.exports = function (port) {
+module.exports = function (port, verbose) {
   let datastudio = new DataStudio();
-  datastudio.expressApp.listen(port, function () {
+  datastudio.server = datastudio.expressApp.listen(port, function () {
 
-    console.log(`DataStudio API listening on port ${port}!`);
+    verbose && console.log(`DataStudio API listening on port ${port}!`);
 
-    false && datastudio.expressApp._router.stack.forEach(layer => {
+    verbose && datastudio.expressApp._router.stack.forEach(layer => {
       try {
         console.log(layer.route.path);
       }

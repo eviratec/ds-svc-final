@@ -12,4 +12,4 @@ process.argv.forEach(val => {
   options[kvPair[0]] = kvPair[1];
 });
 
-require("../")(options.port || DEFAULT_PORT);
+require("../")(options.port || DEFAULT_PORT, true);

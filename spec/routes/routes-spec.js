@@ -83,7 +83,7 @@ describe("API ROUTE", function () {
         expect(spyGet).toHaveBeenCalledWith(_SIGNUP_, _FN_);
       });
 
-      it(`${_GET_} ${_SIGNUPS_}`, function () {
+      it(`${_POST_} ${_SIGNUPS_}`, function () {
         expect(spyPost).toHaveBeenCalledWith(_SIGNUPS_, _FN_, _FN_);
       });
 

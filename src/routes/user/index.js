@@ -104,7 +104,7 @@ module.exports = function (api, db) {
           createUser(),
         ])
         .then(function () {
-          res.send(202);
+          res.status(202).send("");
         })
         .catch(handleErr);
     }
@@ -122,7 +122,8 @@ module.exports = function (api, db) {
     let Token = db.Token;
 
     if (!req.body.Login || !req.body.Password) {
-      return res.send(400, { ErrorMsg: "ERR_INCOMPLETE: Missing Login or Password" })
+      return res.status(400)
+        .send({ ErrorMsg: "ERR_INCOMPLETE: Missing Login or Password" })
     }
 
     let attemptId = v4uuid();
@@ -157,34 +158,33 @@ module.exports = function (api, db) {
             attempt.save({Finished: true, TokenId: token.get("Id")})
               .then(function () {
                 res.setHeader('Location', `/auth/attempt/${attemptId}`);
-                res.send(303);
+                res.status(303).send("");
               })
               .catch(function (err) {
                 console.log(err);
-                res.send(400, { ErrorMsg: err.message });
+                res.status(400).send({ ErrorMsg: err.message });
               });
           })
           .catch(function (err) {
             console.log(err);
-            res.send(400, { ErrorMsg: err.message });
+            res.status(400).send({ ErrorMsg: err.message });
           });
       })
       .catch(function (err) {
-        console.log(err);
         attempt.Error = err.message;
         attempt.Finished = true;
         attempt.save({Finished: true, Error: err.message})
           .then(function () {
-            res.send(400, { ErrorMsg: err.message });
+            res.status(400).send({ ErrorMsg: err.message });
           })
           .catch(function () {
-            res.send(400, { ErrorMsg: err.message });
+            res.status(400).send({ ErrorMsg: err.message });
           });
       });
   });
 
   api.get("/auth/attempt/:authAttemptId", function (req, res) {
-    res.send(200, req.authAttempt);
+    res.status(200).send(req.authAttempt);
   });
 
   function verifyAuthN (Login, Password) {
@@ -224,8 +224,7 @@ module.exports = function (api, db) {
   }
 
   function pwHash (password) {
-    let crypt = dataStudio.bcrypt;
-    var salt = crypt.genSaltSync(10);
+    let salt = crypt.genSaltSync(10);
     return crypt.hashSync(password, salt);
   }
 
@@ -270,7 +269,7 @@ module.exports = function (api, db) {
         next();
       })
       .catch(function () {
-        res.send(400, { ErrorMsg: 'Login/email unavailable' });
+        res.status(400).send({ ErrorMsg: 'Login/email unavailable' });
       });
   }
 
