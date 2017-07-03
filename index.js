@@ -27,6 +27,7 @@ class DataStudio {
     this.db = require("./src/db")();
 
     require("./src/params")(this);
+    require("./src/routes")(this);
 
   }
 }
@@ -274,13 +275,6 @@ api.get("/api/:apiId", function (req, res) {
   res.send(200, req.api);
 });
 
-api.get("/user/:userId", function (req, res) {
-  if (null === req.user) {
-    return res.send(404);
-  }
-  res.send(200, req.user);
-});
-
 api.post("/apps", requireAuthorization, function (req, res) {
   let db = dataStudio.db;
   let App = db.App;
@@ -496,7 +490,14 @@ api.get("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, 
 });
 
 api.listen(3000, function () {
-  console.log("Example app listening on port 3000!")
+  console.log("Example app listening on port 3000!");
+  api._router.stack.forEach(layer => {
+    let x = JSON.stringify(layer.route);
+    if (undefined === x) {
+      return;
+    }
+    console.log(layer.route.path);
+  });
 });
 
 function verifyAuthN (Login, Password) {
