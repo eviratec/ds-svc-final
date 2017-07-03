@@ -1,8 +1,6 @@
 "use strict";
 
 const DataStudio = require("./src/app");
-
-const v4uuid = require("uuid/v4");
 const dataStudio = new DataStudio();
 
 dataStudio.expressApp.listen(3000, function () {

@@ -1,5 +1,8 @@
 "use strict";
 
+const v4uuid = require("uuid/v4");
+const crypt = require("bcryptjs");
+
 function requireAuthorization (req, res, next) {
   if (!req.authorized) {
     return res.send(403);
@@ -46,7 +49,6 @@ module.exports = function (api, db) {
 
   api.post("/signups", checkUsernameAvailability, function (req, res) {
 
-    let db = dataStudio.db;
     let User = db.User;
     let Hash = db.Hash;
 
@@ -116,7 +118,6 @@ module.exports = function (api, db) {
 
   api.post("/auth/attempts", function (req, res) {
 
-    let db = dataStudio.db;
     let AuthAttempt = db.AuthAttempt;
     let Token = db.Token;
 
@@ -189,8 +190,6 @@ module.exports = function (api, db) {
   function verifyAuthN (Login, Password) {
     return new Promise((resolve, reject) => {
 
-      const db = dataStudio.db;
-
       if (!Login || !Password) {
         return reject(new Error());
       }
@@ -232,8 +231,6 @@ module.exports = function (api, db) {
 
   function checkLoginAvailability (Login) {
     return new Promise((resolve, reject) => {
-      let db = dataStudio.db;
-
       if (Login.length < 5 || reservedLogin(Login)) {
         return reject({
           Login: Login,

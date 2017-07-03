@@ -1,5 +1,7 @@
 "use strict";
 
+const v4uuid = require("uuid/v4");
+
 function requireAuthorization (req, res, next) {
   if (!req.authorized) {
     return res.send(403);
@@ -110,7 +112,6 @@ module.exports = function (api, db) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.send(403);
     }
-    let db = dataStudio.db;
     let AppApi = db.AppApi;
     let appId = req.appModel.get("Id");
     let newAppApiId = v4uuid();
@@ -134,7 +135,6 @@ module.exports = function (api, db) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.send(403);
     }
-    let db = dataStudio.db;
     let AppClient = db.AppClient;
     let appId = req.appModel.get("Id");
     let newAppClientId = v4uuid();
@@ -158,7 +158,6 @@ module.exports = function (api, db) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.send(403);
     }
-    let db = dataStudio.db;
     let AppSchema = db.AppSchema;
     let appId = req.appModel.get("Id");
     let newAppSchemaId = v4uuid();

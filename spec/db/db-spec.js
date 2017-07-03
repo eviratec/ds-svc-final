@@ -101,6 +101,10 @@ describe("DATABASE", function () {
         expect('fetchAuthAttemptById' in db).toBe(true);
       });
 
+      it("fetchHashByOwnerId", function () {
+        expect('fetchHashByOwnerId' in db).toBe(true);
+      });
+
     });
 
     describe("FOR TOKENS", function () {
