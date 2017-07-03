@@ -5,7 +5,7 @@ const crypt = require("bcryptjs");
 
 function requireAuthorization (req, res, next) {
   if (!req.authorized) {
-    return res.send(403);
+    return res.status(403).send("");
   }
   next();
 }
@@ -16,9 +16,9 @@ module.exports = function (api, db) {
 
   api.get("/user/:userId", requireAuthorization, function (req, res) {
     if (null === req.user) {
-      return res.send(404);
+      return res.status(404).send("");
     }
-    res.send(200, req.user);
+    res.status(200).send(req.user);
   });
 
   api.put("/user/:userId", requireAuthorization, function (req, res) {
@@ -31,10 +31,10 @@ module.exports = function (api, db) {
 
     checkLoginAvailability(Login)
       .then(function (r) {
-        res.send(200, r);
+        res.status(200).send(r);
       })
       .catch(function () {
-        res.send(200, r);
+        res.status(200).send(r);
       });
 
   });

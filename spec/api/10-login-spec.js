@@ -1,9 +1,7 @@
-const TEST_API_PORT = 9999;
-const DatastudioApi = require("../../");
 
-describe("A HTTP API", function () {
+describe("AUTHENTICATION REST API", function () {
 
-  describe("AUTH ATTEMPT", function () {
+  describe("[ POST   ] /auth/attempts", function () {
 
     let api;
 
@@ -17,8 +15,8 @@ describe("A HTTP API", function () {
 
     beforeEach(function (done) {
 
-      api = DatastudioApi(TEST_API_PORT);
-      $testClient = jasmine.createTestClient(TEST_API_PORT);
+      api = jasmine.startTestApi();
+      $testClient = jasmine.createTestClient();
 
       validLogin = $testClient.uniqueLogin();
       validPassword = $testClient.generatePassword();
@@ -27,6 +25,7 @@ describe("A HTTP API", function () {
       invalidPassword = $testClient.generatePassword();
 
       $testClient.signup(validLogin, validPassword, function (err, res) {
+        if (err) return done(err);
         done();
       });
 
@@ -36,7 +35,7 @@ describe("A HTTP API", function () {
       api.server.close(done);
     });
 
-    it("SHOULD RETURN `HTTP/1.1 400 Bad Request` IF THE LOGIN IS INVALID", function (done) {
+    it("RETURNS `HTTP/1.1 400 Bad Request` WHEN THE LOGIN IS INVALID", function (done) {
       let d = {
         Login: invalidLogin,
         Password: invalidPassword,
@@ -47,7 +46,7 @@ describe("A HTTP API", function () {
       });
     });
 
-    it("SHOULD RETURN `HTTP/1.1 400 Bad Request` IF THE PASSWORD IS INCORRECT", function (done) {
+    it("RETURNS `HTTP/1.1 400 Bad Request` WHEN THE PASSWORD IS INCORRECT", function (done) {
       let d = {
         Login: validLogin,
         Password: invalidPassword,
@@ -58,7 +57,7 @@ describe("A HTTP API", function () {
       });
     });
 
-    it("SHOULD RETURN `HTTP/1.1 303 See Other` IF THE LOGIN IS VALID", function (done) {
+    it("RETURNS `HTTP/1.1 303 See Other` WHEN THE ATTEMPT IS SUCCESSFUL", function (done) {
       let d = {
         Login: validLogin,
         Password: validPassword,
@@ -69,19 +68,17 @@ describe("A HTTP API", function () {
       });
     });
 
-    it("SHOULD RETURN A TOKEN IN THE BODY OF THE VALID AUTH ATTEMPT", function (done) {
+    it("INCLUDES A `Token` IN THE BODY OF A SUCCESSFUL AUTH ATTEMPT", function (done) {
       let d = {
         Login: validLogin,
         Password: validPassword,
       };
       $testClient.$post(null, "/auth/attempts", d, function (err, res) {
-        if (err) {
-          return done(err);
-        }
+        if (err) return done(err);
+        expect(res.statusCode).toBe(303);
+        expect(res.headers.location).toBeDefined();
         $testClient.$get(null, res.headers.location, function (err, res) {
-          if (err) {
-            return done(err);
-          }
+          if (err) return done(err);
           expect(res.statusCode).toBe(200);
           expect(res.d).toEqual(jasmine.objectContaining({
             Token: jasmine.objectContaining({
