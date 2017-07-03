@@ -9,4 +9,16 @@ module.exports = function (api, db) {
     res.send(200, req.api);
   });
 
+  api.put("/api/:apiId", function (req, res) {
+    res.send(404);
+  });
+
+  api.del("/api/:apiId", function (req, res) {
+    res.send(404);
+  });
+
+  api.post("/apis", function (req, res) {
+    res.send(404);
+  });
+
 };

@@ -9,17 +9,18 @@ function requireAuthorization (req, res, next) {
 
 module.exports = function (api, db) {
 
-  api.get("/app/:appId", function (req, res) {
+  api.get("/app/:appId", requireAuthorization, function (req, res) {
     if (null === req.app) {
       return res.send(404);
     }
     res.send(200, req.app);
   });
 
-  api.get("/apps/all", function (req, res) {
-    if (!req.authorized) {
-      return res.send(200, []);
-    }
+  api.put("/app/:appId", requireAuthorization, function (req, res) {
+    return res.send(404);
+  });
+
+  api.get("/apps/all", requireAuthorization, function (req, res) {
     db.fetchAppsByUserId(req.authUser.get("Id"))
       .then(function (apps) {
         res.send(200, apps);

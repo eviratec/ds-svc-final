@@ -11,60 +11,16 @@ module.exports = function (api, db) {
 
   const RESERVED_LOGINS = require("../../etc/reserved.usernames.json");
 
-  api.get("/user/:userId", function (req, res) {
+  api.get("/user/:userId", requireAuthorization, function (req, res) {
     if (null === req.user) {
       return res.send(404);
     }
     res.send(200, req.user);
   });
 
-  function reservedLogin (Login) {
-    let login = Login.toLowerCase();
-    return RESERVED_LOGINS.indexOf(login) > -1;
-  }
-
-  function pwHash (password) {
-    let crypt = dataStudio.bcrypt;
-    var salt = crypt.genSaltSync(10);
-    return crypt.hashSync(password, salt);
-  }
-
-  function checkLoginAvailability (Login) {
-    return new Promise((resolve, reject) => {
-      let db = dataStudio.db;
-
-      if (Login.length < 5 || reservedLogin(Login)) {
-        return reject({
-          Login: Login,
-          Available: false,
-          Reason: "RESERVED",
-        });
-      }
-
-      db.fetchUserByLogin(Login)
-        .then(function (user) {
-
-          if (!user) {
-            return resolve({
-              Login: Login,
-              Available: true,
-            });
-          }
-
-          reject({
-            Login: Login,
-            Available: false,
-          });
-
-        })
-        .catch(function (err) {
-          reject({
-            Login: Login,
-            Available: false,
-          });
-        });
-    });
-  }
+  api.put("/user/:userId", requireAuthorization, function (req, res) {
+    return res.send(404);
+  });
 
   api.get("/login/:login/availability", function (req, res) {
 
@@ -87,16 +43,6 @@ module.exports = function (api, db) {
     }
     res.send(404);
   });
-
-  function checkUsernameAvailability (req, res, next) {
-    checkLoginAvailability(req.body.Email.toLowerCase())
-      .then(function () {
-        next();
-      })
-      .catch(function () {
-        res.send(400, { ErrorMsg: 'Login/email unavailable' });
-      });
-  }
 
   api.post("/signups", checkUsernameAvailability, function (req, res) {
 
@@ -271,6 +217,64 @@ module.exports = function (api, db) {
         });
 
     });
+  }
+
+  function reservedLogin (Login) {
+    let login = Login.toLowerCase();
+    return RESERVED_LOGINS.indexOf(login) > -1;
+  }
+
+  function pwHash (password) {
+    let crypt = dataStudio.bcrypt;
+    var salt = crypt.genSaltSync(10);
+    return crypt.hashSync(password, salt);
+  }
+
+  function checkLoginAvailability (Login) {
+    return new Promise((resolve, reject) => {
+      let db = dataStudio.db;
+
+      if (Login.length < 5 || reservedLogin(Login)) {
+        return reject({
+          Login: Login,
+          Available: false,
+          Reason: "RESERVED",
+        });
+      }
+
+      db.fetchUserByLogin(Login)
+        .then(function (user) {
+
+          if (!user) {
+            return resolve({
+              Login: Login,
+              Available: true,
+            });
+          }
+
+          reject({
+            Login: Login,
+            Available: false,
+          });
+
+        })
+        .catch(function (err) {
+          reject({
+            Login: Login,
+            Available: false,
+          });
+        });
+    });
+  }
+
+  function checkUsernameAvailability (req, res, next) {
+    checkLoginAvailability(req.body.Email.toLowerCase())
+      .then(function () {
+        next();
+      })
+      .catch(function () {
+        res.send(400, { ErrorMsg: 'Login/email unavailable' });
+      });
   }
 
 };
