@@ -268,13 +268,6 @@ api.get("/auth/attempt/:authAttemptId", function (req, res) {
   res.send(200, req.authAttempt);
 });
 
-api.get("/api/:apiId", function (req, res) {
-  if (null === req.api) {
-    return res.send(404);
-  }
-  res.send(200, req.api);
-});
-
 api.post("/apps", requireAuthorization, function (req, res) {
   let db = dataStudio.db;
   let App = db.App;
@@ -326,20 +319,6 @@ api.del("/app/:appId", requireAuthorization, function (req, res) {
       res.send(500);
     });
 
-});
-
-api.get("/apps/all", function (req, res) {
-  if (!req.authorized) {
-    return res.send(200, []);
-  }
-  let db = dataStudio.db;
-  db.fetchAppsByUserId(req.authUser.get("Id"))
-    .then(function (apps) {
-      res.send(200, apps);
-    })
-    .catch(function (err) {
-      res.send(500, { ErrorMsg: err.message });
-    });
 });
 
 

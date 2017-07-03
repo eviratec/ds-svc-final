@@ -1,7 +1,7 @@
 
 const Db = require("../../src/db");
 
-describe("db", function () {
+describe("Database", function () {
 
   let db;
 
@@ -11,47 +11,47 @@ describe("db", function () {
 
   describe("models", function () {
 
-    it("should include 'Api'", function () {
+    it("MUST define <Api>", function () {
       expect('Api' in db).toBe(true);
     });
 
-    it("should include 'AppClient'", function () {
+    it("MUST define <AppClient>", function () {
       expect('AppClient' in db).toBe(true);
     });
 
-    it("should include 'App'", function () {
+    it("MUST define <App>", function () {
       expect('App' in db).toBe(true);
     });
 
-    it("should include 'AppSchema'", function () {
+    it("MUST define <AppSchema>", function () {
       expect('AppSchema' in db).toBe(true);
     });
 
-    it("should include 'AuthAttempt'", function () {
+    it("MUST define <AuthAttempt>", function () {
       expect('AuthAttempt' in db).toBe(true);
     });
 
-    it("should include 'Operation'", function () {
+    it("MUST define <Operation>", function () {
       expect('Operation' in db).toBe(true);
     });
 
-    it("should include 'OperationParameter'", function () {
+    it("MUST define <OperationParameter>", function () {
       expect('OperationParameter' in db).toBe(true);
     });
 
-    it("should include 'Route'", function () {
+    it("MUST define <Route>", function () {
       expect('Route' in db).toBe(true);
     });
 
-    it("should include 'Hash'", function () {
+    it("MUST define <Hash>", function () {
       expect('Hash' in db).toBe(true);
     });
 
-    it("should include 'Token'", function () {
+    it("MUST define <Token>", function () {
       expect('Token' in db).toBe(true);
     });
 
-    it("should include 'User'", function () {
+    it("MUST define <User>", function () {
       expect('User' in db).toBe(true);
     });
 
@@ -61,7 +61,7 @@ describe("db", function () {
 
     describe("(apis)", function () {
 
-      it("should include 'fetchApisByAppId'", function () {
+      it("MUST include 'fetchApisByAppId'", function () {
         expect('fetchApisByAppId' in db).toBe(true);
       });
 
@@ -69,7 +69,7 @@ describe("db", function () {
 
     describe("(apps)", function () {
 
-      it("should include 'fetchAppById'", function () {
+      it("MUST include 'fetchAppById'", function () {
         expect('fetchAppById' in db).toBe(true);
       });
 
@@ -77,11 +77,11 @@ describe("db", function () {
 
     describe("(users)", function () {
 
-      it("should include 'fetchUserById'", function () {
+      it("MUST include 'fetchUserById'", function () {
         expect('fetchUserById' in db).toBe(true);
       });
 
-      it("should include 'fetchUserByLogin'", function () {
+      it("MUST include 'fetchUserByLogin'", function () {
         expect('fetchUserByLogin' in db).toBe(true);
       });
 
@@ -89,11 +89,11 @@ describe("db", function () {
 
     describe("(tokens)", function () {
 
-      it("should include 'fetchTokenById'", function () {
+      it("MUST include 'fetchTokenById'", function () {
         expect('fetchTokenById' in db).toBe(true);
       });
 
-      it("should include 'fetchTokenByKey'", function () {
+      it("MUST include 'fetchTokenByKey'", function () {
         expect('fetchTokenByKey' in db).toBe(true);
       });
 
@@ -101,15 +101,15 @@ describe("db", function () {
 
     describe("(operations)", function () {
 
-      it("should include 'fetchOperationById'", function () {
+      it("MUST include 'fetchOperationById'", function () {
         expect('fetchOperationById' in db).toBe(true);
       });
 
-      it("should include 'fetchOperationsByApiId'", function () {
+      it("MUST include 'fetchOperationsByApiId'", function () {
         expect('fetchOperationsByApiId' in db).toBe(true);
       });
 
-      it("should include 'fetchOperationParameterById'", function () {
+      it("MUST include 'fetchOperationParameterById'", function () {
         expect('fetchOperationParameterById' in db).toBe(true);
       });
 
