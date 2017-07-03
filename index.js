@@ -24,7 +24,7 @@ class DataStudio {
       res.send(200);
     });
 
-    this.db = require("./src/db")(this);
+    this.db = require("./src/db")();
 
     require("./src/params")(this);
 
@@ -265,6 +265,13 @@ api.post("/auth/attempts", function (req, res) {
 
 api.get("/auth/attempt/:authAttemptId", function (req, res) {
   res.send(200, req.authAttempt);
+});
+
+api.get("/api/:apiId", function (req, res) {
+  if (null === req.api) {
+    return res.send(404);
+  }
+  res.send(200, req.api);
 });
 
 api.get("/user/:userId", function (req, res) {

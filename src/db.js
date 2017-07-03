@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (dataStudio) {
+module.exports = function () {
 
   const DBS = [
     "Api",
@@ -8,6 +8,7 @@ module.exports = function (dataStudio) {
     "Auth",
     "Hash",
     "Operation",
+    "Route",
     "Token",
     "User",
   ];

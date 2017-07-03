@@ -54,21 +54,6 @@ module.exports = function (dataStudio) {
 
   });
 
-  api.param("appApiId", function (req, res, next, id) {
-
-    req.appApiModel = null;
-
-    db.fetchAppApiById(id)
-      .then(function (appApi) {
-        req.appApiModel = appApi;
-        next();
-      })
-      .catch(function (err) {
-        next();
-      });
-
-  });
-
   api.param("appClientId", function (req, res, next, id) {
 
     req.appClientModel = null;
@@ -106,6 +91,21 @@ module.exports = function (dataStudio) {
     db.fetchUserById(id)
       .then(function (user) {
         req.user = user;
+        next();
+      })
+      .catch(function (err) {
+        next();
+      });
+
+  });
+
+  api.param("apiId", function (req, res, next, id) {
+
+    req.api = null;
+
+    db.fetchApiById(id)
+      .then(function (api) {
+        req.api = api;
         next();
       })
       .catch(function (err) {

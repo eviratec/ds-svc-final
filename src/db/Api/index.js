@@ -4,47 +4,58 @@ module.exports = function ApiDb (db) {
 
   const bookshelf = db._bookshelf;
 
-  let ApiOperation = bookshelf.Model.extend({
-    tableName: 'api_operations',
+  let Api = bookshelf.Model.extend({
+    tableName: 'app_apis',
     constructor: function() {
       bookshelf.Model.apply(this, arguments);
       this.on('saving', function(model, attrs, options) {
         options.query.where('Id', '=', model.get("Id"));
       });
     },
-    Api: function() {
-      return this.belongsTo(db.AppApi, "ApiId", "Id");
+    App: function() {
+      return this.belongsTo(db.App, "AppId", "Id");
     },
-    Route: function() {
-      return this.belongsTo(db.ApiRoute, "ApiRouteId", "Id");
+    Routes: function() {
+      return this.hasMany(db.Route, "ApiId");
     },
-    Parameters: function() {
-      return this.hasMany(db.OperationParameter, "OperationId");
+    Operations: function() {
+      return this.hasMany(db.Operation, "ApiId");
     },
   });
 
-  db.ApiOperation = ApiOperation;
+  db.Api = Api;
 
-  function fetchApiOperationById (id) {
+  function fetchApiById (id) {
     return new Promise((resolve, reject) => {
-      ApiOperation.where({"Id": id})
-        .fetch({withRelated: ["Parameters"]})
+      Api.where({"Id": id})
+        .fetch({withRelated: ["App", "Operations"]})
         .then(resolve)
         .catch(reject);
     });
   };
 
-  db.fetchApiOperationById = fetchApiOperationById;
+  db.fetchApiById = fetchApiById;
 
-  function fetchApiOperationsByApiId (apiId) {
+  function fetchApisByAppId (appId) {
     return new Promise((resolve, reject) => {
-      ApiOperation.where({"ApiId": apiId})
-        .fetchAll({withRelated: ["Parameters"]})
+      AppApi.where({"AppId": appId, "Deleted": null})
+        .fetchAll()
         .then(resolve)
         .catch(reject);
     });
-  };
+  }
 
-  db.fetchApiOperationById = fetchApiOperationById;
+  db.fetchApisByAppId = fetchApisByAppId;
+
+  function fetchApiById (id) {
+    return new Promise((resolve, reject) => {
+      AppApi.where({"Id": id, "Deleted": null})
+        .fetch({withRelated: ["Routes", "Operations"]})
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  db.fetchApiById = fetchApiById;
 
 };
