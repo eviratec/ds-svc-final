@@ -8,7 +8,7 @@ module.exports = function (port) {
 
     console.log(`DataStudio API listening on port ${port}!`);
 
-    datastudio.expressApp._router.stack.forEach(layer => {
+    false && datastudio.expressApp._router.stack.forEach(layer => {
       try {
         console.log(layer.route.path);
       }

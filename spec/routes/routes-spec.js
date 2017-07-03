@@ -32,7 +32,7 @@ describe("API ROUTE", function () {
   let spyGet;
   let spyPost;
   let spyPut;
-  let spyDel;
+  let spyDelete;
   let dataStudioMock;
   let routes;
 
@@ -41,14 +41,14 @@ describe("API ROUTE", function () {
     spyGet = jasmine.createSpy("get");
     spyPost = jasmine.createSpy("post");
     spyPut = jasmine.createSpy("put");
-    spyDel = jasmine.createSpy("delete");
+    spyDelete = jasmine.createSpy("delete");
 
     dataStudioMock = {
       expressApp: {
         get: spyGet,
         post: spyPost,
         put: spyPut,
-        del: spyDel,
+        delete: spyDelete,
       },
       db: {
 
@@ -144,11 +144,11 @@ describe("API ROUTE", function () {
       });
 
       it(`${_DELETE_} ${_APP_}`, function () {
-        expect(spyDel).toHaveBeenCalledWith(_APP_, _FN_, _FN_);
+        expect(spyDelete).toHaveBeenCalledWith(_APP_, _FN_, _FN_);
       });
 
       it(`${_DELETE_} ${_APP_SCHEMA_}`, function () {
-        expect(spyDel).toHaveBeenCalledWith(_APP_SCHEMA_, _FN_, _FN_);
+        expect(spyDelete).toHaveBeenCalledWith(_APP_SCHEMA_, _FN_, _FN_);
       });
 
     });
@@ -168,7 +168,7 @@ describe("API ROUTE", function () {
       });
 
       it(`${_DELETE_} ${_API_}`, function () {
-        expect(spyDel).toHaveBeenCalledWith(_API_, _FN_, _FN_);
+        expect(spyDelete).toHaveBeenCalledWith(_API_, _FN_, _FN_);
       });
 
     });
