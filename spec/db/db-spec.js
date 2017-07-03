@@ -1,7 +1,7 @@
 
 const Db = require("../../src/db");
 
-describe("Database", function () {
+describe("DATABASE", function () {
 
   let db;
 
@@ -9,107 +9,123 @@ describe("Database", function () {
     db = Db();
   });
 
-  describe("models", function () {
+  describe("MODELS", function () {
 
-    it("MUST define <Api>", function () {
+    it("Api", function () {
       expect('Api' in db).toBe(true);
     });
 
-    it("MUST define <AppClient>", function () {
+    it("AppClient", function () {
       expect('AppClient' in db).toBe(true);
     });
 
-    it("MUST define <App>", function () {
+    it("App", function () {
       expect('App' in db).toBe(true);
     });
 
-    it("MUST define <AppSchema>", function () {
+    it("AppSchema", function () {
       expect('AppSchema' in db).toBe(true);
     });
 
-    it("MUST define <AuthAttempt>", function () {
+    it("AuthAttempt", function () {
       expect('AuthAttempt' in db).toBe(true);
     });
 
-    it("MUST define <Operation>", function () {
+    it("Operation", function () {
       expect('Operation' in db).toBe(true);
     });
 
-    it("MUST define <OperationParameter>", function () {
+    it("OperationParameter", function () {
       expect('OperationParameter' in db).toBe(true);
     });
 
-    it("MUST define <Route>", function () {
+    it("Route", function () {
       expect('Route' in db).toBe(true);
     });
 
-    it("MUST define <Hash>", function () {
+    it("Hash", function () {
       expect('Hash' in db).toBe(true);
     });
 
-    it("MUST define <Token>", function () {
+    it("Token", function () {
       expect('Token' in db).toBe(true);
     });
 
-    it("MUST define <User>", function () {
+    it("User", function () {
       expect('User' in db).toBe(true);
     });
 
   });
 
-  describe("functions", function () {
+  describe("SUGAR METHODS", function () {
 
-    describe("(apis)", function () {
+    describe("FOR APIS", function () {
 
-      it("MUST include 'fetchApisByAppId'", function () {
+      it("fetchApiById", function () {
+        expect('fetchApiById' in db).toBe(true);
+      });
+
+      it("fetchApisByAppId", function () {
         expect('fetchApisByAppId' in db).toBe(true);
       });
 
     });
 
-    describe("(apps)", function () {
+    describe("FOR APPS", function () {
 
-      it("MUST include 'fetchAppById'", function () {
+      it("fetchAppById", function () {
         expect('fetchAppById' in db).toBe(true);
       });
 
+      it("fetchAppClientById", function () {
+        expect('fetchAppClientById' in db).toBe(true);
+      });
+
+      it("fetchAppSchemaById", function () {
+        expect('fetchAppSchemaById' in db).toBe(true);
+      });
+
     });
 
-    describe("(users)", function () {
+    describe("FOR USERS", function () {
 
-      it("MUST include 'fetchUserById'", function () {
+      it("fetchUserById", function () {
         expect('fetchUserById' in db).toBe(true);
       });
 
-      it("MUST include 'fetchUserByLogin'", function () {
+      it("fetchUserByLogin", function () {
         expect('fetchUserByLogin' in db).toBe(true);
+      });
+
+      it("fetchAuthAttemptById", function () {
+        expect('fetchAuthAttemptById' in db).toBe(true);
       });
 
     });
 
-    describe("(tokens)", function () {
+    describe("FOR TOKENS", function () {
 
-      it("MUST include 'fetchTokenById'", function () {
+      it("fetchTokenById", function () {
         expect('fetchTokenById' in db).toBe(true);
       });
 
-      it("MUST include 'fetchTokenByKey'", function () {
+      it("fetchTokenByKey", function () {
         expect('fetchTokenByKey' in db).toBe(true);
       });
 
     });
 
-    describe("(operations)", function () {
+    describe("FOR OPERATIONS", function () {
 
-      it("MUST include 'fetchOperationById'", function () {
+      it("fetchOperationById", function () {
         expect('fetchOperationById' in db).toBe(true);
       });
 
-      it("MUST include 'fetchOperationsByApiId'", function () {
+      it("fetchOperationsByApiId", function () {
         expect('fetchOperationsByApiId' in db).toBe(true);
       });
 
-      it("MUST include 'fetchOperationParameterById'", function () {
+      it("fetchOperationParameterById", function () {
         expect('fetchOperationParameterById' in db).toBe(true);
       });
 

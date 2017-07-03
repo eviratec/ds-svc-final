@@ -59,6 +59,17 @@ module.exports = function AppDb (db) {
 
   db.App = App;
 
+  function fetchAppById (id) {
+    return new Promise((resolve, reject) => {
+      App.where({"Id": id})
+        .fetch()
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  db.fetchAppById = fetchAppById;
+
   function fetchAppApiById (id) {
     return new Promise((resolve, reject) => {
       AppApi.where({"Id": id})
