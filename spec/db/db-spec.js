@@ -57,4 +57,64 @@ describe("db", function () {
 
   });
 
+  describe("functions", function () {
+
+    describe("(apis)", function () {
+
+      it("should include 'fetchApisByAppId'", function () {
+        expect('fetchApisByAppId' in db).toBe(true);
+      });
+
+    });
+
+    describe("(apps)", function () {
+
+      it("should include 'fetchAppById'", function () {
+        expect('fetchAppById' in db).toBe(true);
+      });
+
+    });
+
+    describe("(users)", function () {
+
+      it("should include 'fetchUserById'", function () {
+        expect('fetchUserById' in db).toBe(true);
+      });
+
+      it("should include 'fetchUserByLogin'", function () {
+        expect('fetchUserByLogin' in db).toBe(true);
+      });
+
+    });
+
+    describe("(tokens)", function () {
+
+      it("should include 'fetchTokenById'", function () {
+        expect('fetchTokenById' in db).toBe(true);
+      });
+
+      it("should include 'fetchTokenByKey'", function () {
+        expect('fetchTokenByKey' in db).toBe(true);
+      });
+
+    });
+
+    describe("(operations)", function () {
+
+      it("should include 'fetchOperationById'", function () {
+        expect('fetchOperationById' in db).toBe(true);
+      });
+
+      it("should include 'fetchOperationsByApiId'", function () {
+        expect('fetchOperationsByApiId' in db).toBe(true);
+      });
+
+      it("should include 'fetchOperationParameterById'", function () {
+        expect('fetchOperationParameterById' in db).toBe(true);
+      });
+
+    });
+
+  });
+
 });
