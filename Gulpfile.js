@@ -11,7 +11,7 @@ gulp.task('test', function (cb) {
 });
 
 gulp.task('dev', function () {
-  return watch('**/*.js', function () {
+  return watch('**/*.js', { readDelay: 2000 }, function () {
     fork('node_modules/jasmine/bin/jasmine.js', {cwd: __dirname});
   });
 });
