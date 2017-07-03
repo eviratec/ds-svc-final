@@ -15,4 +15,6 @@ module.exports = function (dataStudio) {
     require(`./routes/${t}`)(api, db);
   });
 
+  return this;
+
 }

@@ -6,7 +6,7 @@ describe("routes", function () {
   let spyGet;
   let spyPost;
   let spyPut;
-  let spyDelete;
+  let spyDel;
   let dataStudioMock;
   let routes;
 
@@ -15,14 +15,14 @@ describe("routes", function () {
     spyGet = jasmine.createSpy("get");
     spyPost = jasmine.createSpy("post");
     spyPut = jasmine.createSpy("put");
-    spyDelete = jasmine.createSpy("delete");
+    spyDel = jasmine.createSpy("delete");
 
     dataStudioMock = {
       expressApp: {
         get: spyGet,
         post: spyPost,
         put: spyPut,
-        delete: spyDelete,
+        del: spyDel,
       },
       db: {
 
@@ -45,28 +45,96 @@ describe("routes", function () {
         expect(spyPut).toHaveBeenCalledWith("/user/:userId", jasmine.any(Function));
       });
 
+      it("MUST define: [GET   ] /login/:login/availability", function () {
+        expect(spyGet).toHaveBeenCalledWith("/login/:login/availability", jasmine.any(Function));
+      });
+
+    });
+
+    describe("signups", function () {
+
+      it("MUST define: [GET   ] /signup/:signupId", function () {
+        expect(spyGet).toHaveBeenCalledWith("/signup/:signupId", jasmine.any(Function));
+      });
+
+      it("MUST define: [POST  ] /signups", function () {
+        expect(spyPost).toHaveBeenCalledWith("/signups", jasmine.any(Function), jasmine.any(Function));
+      });
+
+    });
+
+    describe("auth", function () {
+
+      it("MUST define: [POST  ] /auth/attempts", function () {
+        expect(spyPost).toHaveBeenCalledWith("/auth/attempts", jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /auth/attempt/:authAttemptId", function () {
+        expect(spyGet).toHaveBeenCalledWith("/auth/attempt/:authAttemptId", jasmine.any(Function));
+      });
+
     });
 
     describe("apps", function () {
 
       it("MUST define: [POST  ] /apps", function () {
-        expect(spyPost).toHaveBeenCalledWith("/apps", jasmine.any(Function));
+        expect(spyPost).toHaveBeenCalledWith("/apps", jasmine.any(Function), jasmine.any(Function));
       });
 
       it("MUST define: [GET   ] /apps/all", function () {
-        expect(spyGet).toHaveBeenCalledWith("/apps/all", jasmine.any(Function));
+        expect(spyGet).toHaveBeenCalledWith("/apps/all", jasmine.any(Function), jasmine.any(Function));
       });
 
       it("MUST define: [GET   ] /app/:appId", function () {
-        expect(spyGet).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function));
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /app/:appId/schema/:schemaId", function () {
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId/schema/:schemaId", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /app/:appId/schemas", function () {
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId/schemas", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [POST   ] /app/:appId/schemas", function () {
+        expect(spyPost).toHaveBeenCalledWith("/app/:appId/schemas", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /app/:appId/api/:apiId", function () {
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId/api/:apiId", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /app/:appId/apis", function () {
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId/apis", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [POST   ] /app/:appId/apis", function () {
+        expect(spyPost).toHaveBeenCalledWith("/app/:appId/apis", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /app/:appId/client/:clientId", function () {
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId/client/:clientId", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [GET   ] /app/:appId/clients", function () {
+        expect(spyGet).toHaveBeenCalledWith("/app/:appId/clients", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [POST   ] /app/:appId/clients", function () {
+        expect(spyPost).toHaveBeenCalledWith("/app/:appId/clients", jasmine.any(Function), jasmine.any(Function));
       });
 
       it("MUST define: [PUT   ] /app/:appId", function () {
-        expect(spyPut).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function));
+        expect(spyPut).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function), jasmine.any(Function));
       });
 
       it("MUST define: [DELETE] /app/:appId", function () {
-        expect(spyDelete).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function));
+        expect(spyDel).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it("MUST define: [DELETE] /app/:appId/schema/:appSchemaId", function () {
+        expect(spyDel).toHaveBeenCalledWith("/app/:appId/schema/:appSchemaId", jasmine.any(Function), jasmine.any(Function));
       });
 
     });
@@ -90,7 +158,7 @@ describe("routes", function () {
       });
 
       it("MUST define: [DELETE] /api/:apiId", function () {
-        expect(spyDelete).toHaveBeenCalledWith("/api/:apiId", jasmine.any(Function));
+        expect(spyDel).toHaveBeenCalledWith("/api/:apiId", jasmine.any(Function));
       });
 
     });
