@@ -13,6 +13,22 @@ describe("API ROUTE", function () {
   const _SIGNUP_ = "/signup/:signupId";
   const _SIGNUPS_ = "/signups";
 
+  const _APP_ = "/app/:appId";
+  const _APP_SCHEMAS_ = "/app/:appId/schemas";
+  const _APP_SCHEMA_ = "/app/:appId/schema/:schemaId";
+  const _APP_APIS_ = "/app/:appId/apis";
+  const _APP_CLIENTS_ = "/app/:appId/clients";
+  const _APPS_ = "/apps";
+  const _ALL_APPS_ = "/apps/all";
+
+  const _API_ = "/api/:apiId";
+  const _APIS_ = "/apis";
+
+  const _AUTH_ATTEMPT_ = "/auth/attempt/:authAttemptId";
+  const _AUTH_ATTEMPTS_ = "/auth/attempts";
+
+  const _FN_ = jasmine.any(Function);
+
   let spyGet;
   let spyPost;
   let spyPut;
@@ -48,15 +64,15 @@ describe("API ROUTE", function () {
     describe("FOR USERS", function () {
 
       it(`${_GET_} ${_USER_}`, function () {
-        expect(spyGet).toHaveBeenCalledWith(_USER_, jasmine.any(Function), jasmine.any(Function));
+        expect(spyGet).toHaveBeenCalledWith(_USER_, _FN_, _FN_);
       });
 
       it(`${_PUT_} ${_USER_}`, function () {
-        expect(spyPut).toHaveBeenCalledWith(_USER_, jasmine.any(Function), jasmine.any(Function));
+        expect(spyPut).toHaveBeenCalledWith(_USER_, _FN_, _FN_);
       });
 
       it(`${_GET_} ${_LOGIN_AVAILABILITY_}`, function () {
-        expect(spyGet).toHaveBeenCalledWith(_LOGIN_AVAILABILITY_, jasmine.any(Function));
+        expect(spyGet).toHaveBeenCalledWith(_LOGIN_AVAILABILITY_, _FN_);
       });
 
     });
@@ -64,95 +80,95 @@ describe("API ROUTE", function () {
     describe("FOR SIGNUPS", function () {
 
       it(`${_GET_} ${_SIGNUP_}`, function () {
-        expect(spyGet).toHaveBeenCalledWith(_SIGNUP_, jasmine.any(Function));
+        expect(spyGet).toHaveBeenCalledWith(_SIGNUP_, _FN_);
       });
 
       it(`${_GET_} ${_SIGNUPS_}`, function () {
-        expect(spyPost).toHaveBeenCalledWith(_SIGNUPS_, jasmine.any(Function), jasmine.any(Function));
+        expect(spyPost).toHaveBeenCalledWith(_SIGNUPS_, _FN_, _FN_);
       });
 
     });
 
     describe("FOR AUTH", function () {
 
-      it(_POST_ + " /auth/attempts", function () {
-        expect(spyPost).toHaveBeenCalledWith("/auth/attempts", jasmine.any(Function));
+      it(`${_POST_} ${_AUTH_ATTEMPTS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_AUTH_ATTEMPTS_, _FN_);
       });
 
-      it(_GET_ + " /auth/attempt/:authAttemptId", function () {
-        expect(spyGet).toHaveBeenCalledWith("/auth/attempt/:authAttemptId", jasmine.any(Function));
+      it(`${_GET_} ${_AUTH_ATTEMPT_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_AUTH_ATTEMPT_, _FN_);
       });
 
     });
 
     describe("FOR APPS", function () {
 
-      it(_POST_ + " /apps", function () {
-        expect(spyPost).toHaveBeenCalledWith("/apps", jasmine.any(Function), jasmine.any(Function));
+      it(`${_POST_} ${_APPS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APPS_, _FN_, _FN_);
       });
 
-      it(_GET_ + " /apps/all", function () {
-        expect(spyGet).toHaveBeenCalledWith("/apps/all", jasmine.any(Function), jasmine.any(Function));
+      it(`${_GET_} ${_ALL_APPS_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_ALL_APPS_, _FN_, _FN_);
       });
 
-      it(_GET_ + " /app/:appId", function () {
-        expect(spyGet).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function), jasmine.any(Function));
+      it(`${_GET_} ${_APP_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_APP_, _FN_, _FN_);
       });
 
-      it(_GET_ + " /app/:appId/schemas", function () {
-        expect(spyGet).toHaveBeenCalledWith("/app/:appId/schemas", jasmine.any(Function), jasmine.any(Function));
+      it(`${_GET_} ${_APP_SCHEMAS_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_APP_SCHEMAS_, _FN_, _FN_);
       });
 
-      it(_POST_ + " /app/:appId/schemas", function () {
-        expect(spyPost).toHaveBeenCalledWith("/app/:appId/schemas", jasmine.any(Function), jasmine.any(Function));
+      it(`${_POST_} ${_APP_SCHEMAS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APP_SCHEMAS_, _FN_, _FN_);
       });
 
-      it(_GET_ + " /app/:appId/apis", function () {
-        expect(spyGet).toHaveBeenCalledWith("/app/:appId/apis", jasmine.any(Function), jasmine.any(Function));
+      it(`${_GET_} ${_APP_APIS_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_APP_APIS_, _FN_, _FN_);
       });
 
-      it(_POST_ + " /app/:appId/apis", function () {
-        expect(spyPost).toHaveBeenCalledWith("/app/:appId/apis", jasmine.any(Function), jasmine.any(Function));
+      it(`${_POST_} ${_APP_APIS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APP_APIS_, _FN_, _FN_);
       });
 
-      it(_GET_ + " /app/:appId/clients", function () {
-        expect(spyGet).toHaveBeenCalledWith("/app/:appId/clients", jasmine.any(Function), jasmine.any(Function));
+      it(`${_GET_} ${_APP_CLIENTS_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_APP_CLIENTS_, _FN_, _FN_);
       });
 
-      it(_POST_ + " /app/:appId/clients", function () {
-        expect(spyPost).toHaveBeenCalledWith("/app/:appId/clients", jasmine.any(Function), jasmine.any(Function));
+      it(`${_POST_} ${_APP_CLIENTS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APP_CLIENTS_, _FN_, _FN_);
       });
 
-      it(_PUT_ + " /app/:appId", function () {
-        expect(spyPut).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function), jasmine.any(Function));
+      it(`${_PUT_} ${_APP_}`, function () {
+        expect(spyPut).toHaveBeenCalledWith(_APP_, _FN_, _FN_);
       });
 
-      it(_DELETE_ + " /app/:appId", function () {
-        expect(spyDel).toHaveBeenCalledWith("/app/:appId", jasmine.any(Function), jasmine.any(Function));
+      it(`${_DELETE_} ${_APP_}`, function () {
+        expect(spyDel).toHaveBeenCalledWith(_APP_, _FN_, _FN_);
       });
 
-      it(_DELETE_ + " /app/:appId/schema/:appSchemaId", function () {
-        expect(spyDel).toHaveBeenCalledWith("/app/:appId/schema/:appSchemaId", jasmine.any(Function), jasmine.any(Function));
+      it(`${_DELETE_} ${_APP_SCHEMA_}`, function () {
+        expect(spyDel).toHaveBeenCalledWith(_APP_SCHEMA_, _FN_, _FN_);
       });
 
     });
 
     describe("FOR APIS", function () {
 
-      it(_POST_ + " /apis", function () {
-        expect(spyPost).toHaveBeenCalledWith("/apis", jasmine.any(Function));
+      it(`${_POST_} ${_APIS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APIS_, _FN_, _FN_);
       });
 
-      it(_GET_ + " /api/:apiId", function () {
-        expect(spyGet).toHaveBeenCalledWith("/api/:apiId", jasmine.any(Function));
+      it(`${_GET_} ${_API_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_API_, _FN_, _FN_);
       });
 
-      it(_PUT_ + " /api/:apiId", function () {
-        expect(spyPut).toHaveBeenCalledWith("/api/:apiId", jasmine.any(Function));
+      it(`${_PUT_} ${_API_}`, function () {
+        expect(spyPut).toHaveBeenCalledWith(_API_, _FN_, _FN_);
       });
 
-      it(_DELETE_ + " /api/:apiId", function () {
-        expect(spyDel).toHaveBeenCalledWith("/api/:apiId", jasmine.any(Function));
+      it(`${_DELETE_} ${_API_}`, function () {
+        expect(spyDel).toHaveBeenCalledWith(_API_, _FN_, _FN_);
       });
 
     });

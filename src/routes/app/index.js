@@ -178,7 +178,7 @@ module.exports = function (api, db) {
       });
   });
 
-  api.del("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, res) {
+  api.del("/app/:appId/schema/:schemaId", requireAuthorization, function (req, res) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.send(403);
     }
