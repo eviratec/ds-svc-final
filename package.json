@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "./bin/ds-api --port=3000",
     "test": "jasmine"
+  },
+  "bin": {
+    "ds-api": "ds-api"
   },
   "author": "",
   "license": "ISC",

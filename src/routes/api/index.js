@@ -20,7 +20,7 @@ module.exports = function (api, db) {
     res.send(404);
   });
 
-  api.del("/api/:apiId", requireAuthorization, function (req, res) {
+  api.delete("/api/:apiId", requireAuthorization, function (req, res) {
     res.send(404);
   });
 

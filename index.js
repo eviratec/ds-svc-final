@@ -1,17 +1,20 @@
 "use strict";
 
 const DataStudio = require("./src/app");
-const dataStudio = new DataStudio();
 
-dataStudio.expressApp.listen(3000, function () {
+module.exports = function (port) {
+  let datastudio = new DataStudio();
+  datastudio.expressApp.listen(port, function () {
 
-  console.log("Example app listening on port 3000!");
+    console.log(`DataStudio API listening on port ${port}!`);
 
-  dataStudio.expressApp._router.stack.forEach(layer => {
-    try {
-      console.log(layer.route.path);
-    }
-    catch (e) {}
+    datastudio.expressApp._router.stack.forEach(layer => {
+      try {
+        console.log(layer.route.path);
+      }
+      catch (e) {}
+    });
+
   });
-
-});
+  return datastudio;
+}

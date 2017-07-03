@@ -68,7 +68,7 @@ module.exports = function (api, db) {
       });
   });
 
-  api.del("/app/:appId", requireAuthorization, function (req, res) {
+  api.delete("/app/:appId", requireAuthorization, function (req, res) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.send(403);
     }
@@ -178,7 +178,7 @@ module.exports = function (api, db) {
       });
   });
 
-  api.del("/app/:appId/schema/:schemaId", requireAuthorization, function (req, res) {
+  api.delete("/app/:appId/schema/:schemaId", requireAuthorization, function (req, res) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.send(403);
     }
