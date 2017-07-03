@@ -1,4 +1,7 @@
 
+const CORS_ALLOW_ORIGINS = "*";
+const CORS_ALLOW_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+
 class DataStudio {
   constructor () {
 
@@ -20,10 +23,10 @@ class DataStudio {
       res.send(200);
     });
 
-    this.db = require("./src/db")();
+    this.db = require("./db")();
 
-    require("./src/params")(this);
-    require("./src/routes")(this);
+    require("./params")(this);
+    require("./routes")(this);
 
   }
 }

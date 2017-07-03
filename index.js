@@ -1,8 +1,5 @@
 "use strict";
 
-const CORS_ALLOW_ORIGINS = "*";
-const CORS_ALLOW_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
-
 const DataStudio = require("./src/app");
 
 const v4uuid = require("uuid/v4");
@@ -12,12 +9,11 @@ dataStudio.expressApp.listen(3000, function () {
 
   console.log("Example app listening on port 3000!");
 
-  api._router.stack.forEach(layer => {
-    let x = JSON.stringify(layer.route);
-    if (undefined === x) {
-      return;
+  dataStudio.expressApp._router.stack.forEach(layer => {
+    try {
+      console.log(layer.route.path);
     }
-    console.log(layer.route.path);
+    catch (e) {}
   });
 
 });
