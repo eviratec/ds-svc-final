@@ -4,7 +4,7 @@ INDEV: App &amp; User Auth Service for DataStudio
 This works with:
 https://github.com/eviratec/ngui
 
-## If you <3 it: Please consider donating
+## If you 💖 it: Please consider donating
 
 It might make more of a difference than you think!
 
