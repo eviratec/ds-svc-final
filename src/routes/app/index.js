@@ -108,69 +108,51 @@ module.exports = function (api, db) {
 
   });
 
-  api.post("/app/:appId/apis", requireAuthorization, function (req, res) {
-    if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
-      return res.sendStatus(403);
-    }
-    let AppApi = db.AppApi;
-    let appId = req.appModel.get("Id");
-    let newAppApiId = v4uuid();
-    let newAppApi = new AppApi({
-      Id: newAppApiId,
-      AppId: appId,
-      Name: req.body.Name || "NewApi",
-      Created: Math.floor(Date.now()/1000),
-    });
-    newAppApi.save()
-      .then(function (appApi) {
-        res.setHeader('Location', `/app/${appId}/api/${appApi.get("Id")}`);
-        res.sendStatus(303);
-      })
-      .catch(function (err) {
-        res.status(400).send({ ErrorMsg: err.message });
-      });
-  });
-
-  api.post("/app/:appId/clients", requireAuthorization, function (req, res) {
-    if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
-      return res.sendStatus(403);
+  api.post("/app/:appId/:subTypeName", requireAuthorization, function (req, res) {
+    console.log(req.appModel);
+    console.log(req.subTypeName);
+    let t = {
+      "clients": "client",
+      "apis": "api",
+      "schemas": "schema",
     }
     let AppClient = db.AppClient;
-    let appId = req.appModel.get("Id");
-    let newAppClientId = v4uuid();
-    let newAppClient = new AppClient({
-      Id: newAppClientId,
-      AppId: appId,
-      Name: req.body.Name || "NewClient",
-      Created: Math.floor(Date.now()/1000),
-    });
-    newAppClient.save()
-      .then(function (appClient) {
-        res.setHeader('Location', `/app/${appId}/client/${appClient.get("Id")}`);
-        res.sendStatus(303);
-      })
-      .catch(function (err) {
-        res.status(400).send({ ErrorMsg: err.message });
-      });
-  });
-
-  api.post("/app/:appId/schemas", requireAuthorization, function (req, res) {
-    if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
-      return res.sendStatus(403);
-    }
+    let AppApi = db.AppApi;
     let AppSchema = db.AppSchema;
+    let subTypeName = req.subTypeName;
     let appId = req.appModel.get("Id");
-    let newAppSchemaId = v4uuid();
-    let newAppSchema = new AppSchema({
-      Id: newAppSchemaId,
-      AppId: appId,
-      Name: req.body.Name || "NewSchema",
-      Ref: req.body.Ref || "#" + req.body.Name,
-      Created: Math.floor(Date.now()/1000),
-    });
-    newAppSchema.save()
-      .then(function (appSchema) {
-        res.setHeader('Location', `/app/${appId}/schema/${appSchema.get("Id")}`);
+    let newAppThingId = v4uuid();
+    let newAppThing;
+    switch (subTypeName) {
+      case "clients":
+        newAppThing = new AppClient({
+          Id: newAppThingId,
+          AppId: appId,
+          Name: req.body.Name || "NewClient",
+          Created: Math.floor(Date.now()/1000),
+        });
+        break;
+      case "apis":
+        newAppThing = new AppApi({
+          Id: newAppThingId,
+          AppId: appId,
+          Name: req.body.Name || "NewApi",
+          Created: Math.floor(Date.now()/1000),
+        });
+        break;
+      case "schemas":
+        newAppThing = new AppSchema({
+          Id: newAppThingId,
+          AppId: appId,
+          Name: req.body.Name || "NewSchema",
+          Ref: req.body.Ref || "#" + req.body.Name,
+          Created: Math.floor(Date.now()/1000),
+        });
+        break;
+    }
+    newAppThing.save()
+      .then(function (appThing) {
+        res.setHeader('Location', `/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`);
         res.sendStatus(303);
       })
       .catch(function (err) {

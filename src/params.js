@@ -38,7 +38,12 @@ module.exports = function (dataStudio) {
 
   });
 
-  api.param("appId", function (req, res, next, id) {
+  api.param(["subTypeName"], function (req, res, next, id) {
+    req.subTypeName = id;
+    next();
+  });
+
+  api.param(["appId"], function (req, res, next, id) {
 
     req.appModel = null;
 
@@ -48,7 +53,7 @@ module.exports = function (dataStudio) {
         next();
       })
       .catch(function (err) {
-        console.log(err);
+        console.log("FUCKFUCK");
         next();
       });
 

@@ -32,26 +32,7 @@ describe("APP REST API", function () {
     api.server.close(done);
   });
 
-  describe("[ GET    ] /apps/all", function () {
-
-    it("RETURNS `HTTP/1.1 403 Forbidden` WHEN `Authorization` HEADER IS NOT PROVIDED", function (done) {
-      $testClient.$get(null, `/apps/all`, function (err, res) {
-        expect(res.statusCode).toBe(403);
-        done();
-      });
-    });
-
-    it("RETURNS `HTTP/1.1 200 OK` WITH AN ARRAY WHEN `Authorization` HEADER IS PROVIDED", function (done) {
-      $testClient.$get(authorization, `/apps/all`, function (err, res) {
-        expect(res.statusCode).toBe(200);
-        expect(Array.isArray(res.d)).toBe(true);
-        done();
-      });
-    });
-
-  });
-
-  describe("[ POST   ] /apps", function () {
+  describe("/apps", function () {
 
     let d;
 
@@ -61,18 +42,46 @@ describe("APP REST API", function () {
       };
     });
 
-    it("RETURNS `HTTP/1.1 403 Forbidden` WHEN `Authorization` HEADER IS NOT PROVIDED", function (done) {
-      $testClient.$post(null, `/apps`, d, function (err, res) {
-        expect(res.statusCode).toBe(403);
-        done();
+    describe("createApp <POST> with valid parameters", function () {
+
+      it("RETURNS `HTTP/1.1 403 Forbidden` WHEN `Authorization` HEADER IS NOT PROVIDED", function (done) {
+        $testClient.$post(null, `/apps`, d, function (err, res) {
+          expect(res.statusCode).toBe(403);
+          done();
+        });
       });
+
+      it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
+        $testClient.$post(authorization, `/apps`, d, function (err, res) {
+          expect(res.statusCode).toBe(303);
+          expect(res.headers.location).toMatch(/^\/app\/([a-z0-9-]{36})$/);
+          done();
+        });
+      });
+
     });
 
-    it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
-      $testClient.$post(authorization, `/apps`, d, function (err, res) {
-        expect(res.statusCode).toBe(303);
-        done();
+  });
+
+  describe("/apps/all", function () {
+
+    describe("getAllApps <GET>", function () {
+
+      it("RETURNS `HTTP/1.1 403 Forbidden` WHEN `Authorization` HEADER IS NOT PROVIDED", function (done) {
+        $testClient.$get(null, `/apps/all`, function (err, res) {
+          expect(res.statusCode).toBe(403);
+          done();
+        });
       });
+
+      it("RETURNS `HTTP/1.1 200 OK` WITH AN ARRAY WHEN `Authorization` HEADER IS PROVIDED", function (done) {
+        $testClient.$get(authorization, `/apps/all`, function (err, res) {
+          expect(res.statusCode).toBe(200);
+          expect(Array.isArray(res.d)).toBe(true);
+          done();
+        });
+      });
+
     });
 
   });

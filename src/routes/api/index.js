@@ -25,7 +25,22 @@ module.exports = function (api, db) {
   });
 
   api.post("/apis", requireAuthorization, function (req, res) {
-    res.send(404);
+    let AppApi = db.AppApi;
+    let newAppApiId = v4uuid();
+    let newAppApi = new AppApi({
+      Id: newAppApiId,
+      AppId: req.body.AppId,
+      Name: req.body.Name || "NewApi",
+      Created: Math.floor(Date.now()/1000),
+    });
+    newAppApi.save()
+      .then(function (appApi) {
+        res.setHeader('Location', `/app/${appId}/api/${appApi.get("Id")}`);
+        res.sendStatus(303);
+      })
+      .catch(function (err) {
+        res.status(400).send({ ErrorMsg: err.message });
+      });
   });
 
 };

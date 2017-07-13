@@ -14,10 +14,10 @@ describe("API ROUTE", function () {
   const _SIGNUPS_ = "/signups";
 
   const _APP_ = "/app/:appId";
-  const _APP_SCHEMAS_ = "/app/:appId/schemas";
+  const _APP_SCHEMAS_ = "/schemas";
   const _APP_SCHEMA_ = "/app/:appId/schema/:schemaId";
-  const _APP_APIS_ = "/app/:appId/apis";
-  const _APP_CLIENTS_ = "/app/:appId/clients";
+  const _APP_APIS_ = "/apis";
+  const _APP_CLIENTS_ = "/clients";
   const _APPS_ = "/apps";
   const _ALL_APPS_ = "/apps/all";
 
