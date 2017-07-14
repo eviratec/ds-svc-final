@@ -128,10 +128,9 @@ module.exports = function (dataStudio) {
     let newAppThing;
     switch (subTypeName) {
       case "client":
-      console.log("@@@@@client",subTypeId);
         db.fetchClientById(subTypeId)
           .then(function (client) {
-            res.send(200, client);
+            res.status(200).send(client);
           })
           .catch(function (err) {
             console.log(err);
@@ -139,10 +138,9 @@ module.exports = function (dataStudio) {
           });
         break;
       case "api":
-      console.log("@@@@@api",subTypeId);
         db.fetchApiById(subTypeId)
           .then(function (api) {
-            res.send(200, api);
+            res.status(200).send(api);
           })
           .catch(function (err) {
             console.log(err);
@@ -150,7 +148,6 @@ module.exports = function (dataStudio) {
           });
         break;
       case "schema":
-      console.log("@@@@@schema",subTypeId);
         db.fetchSchemaById(subTypeId)
           .then(function (schema) {
             res.send(200, schema);

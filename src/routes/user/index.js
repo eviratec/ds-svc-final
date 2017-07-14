@@ -130,65 +130,53 @@ module.exports = function (dataStudio) {
         .send({ ErrorMsg: "ERR_INCOMPLETE: Missing Login or Password" })
     }
 
+    let login = req.body.Login;
     let attemptId = v4uuid();
-
-    let attempt = new AuthAttempt({
-      Id: attemptId,
-      Login: req.body.Login,
-      Finished: false,
-      Error: null,
-      TokenId: null,
-      Created: new Date(),
-    });
-
-    events.emit("auth/attempt", {
-      Id: attemptId,
-      Login: req.body.Login
-    });
+    let tokenId = v4uuid();
 
     function createToken (user, expiry) {
-      let tokenId = v4uuid();
       let tsNow = Math.floor(Date.now()/1000);
-      let token = new Token({
+      return Token.forge({
         Id: tokenId,
         UserId: user.get("Id"),
         Key: `${tokenId}/${user.get("Id")}/${tsNow}`,
         Created: tsNow,
         Expiry: expiry || 3600,
-      });
-      return token.save();
+      }).save();
     }
 
     verifyAuthN(req.body.Login, req.body.Password)
       .then(function (user) {
 
+        events.emit("auth/attempt:success", {
+          Id: attemptId,
+          Login: login,
+          TokenId: tokenId,
+        });
+
         createToken(user, 86400)
           .then(function (token) {
-            attempt.save({Finished: true, TokenId: token.get("Id")})
-              .then(function () {
-                res.setHeader('Location', `/auth/attempt/${attemptId}`);
-                res.status(303).send("");
-              })
-              .catch(function (err) {
-                console.log(err);
-                res.status(400).send({ ErrorMsg: err.message });
-              });
+
+            res.setHeader('Location', `/auth/attempt/${attemptId}`);
+            res.status(303).send("");
+
           })
           .catch(function (err) {
             console.log(err);
             res.status(400).send({ ErrorMsg: err.message });
           });
+
       })
       .catch(function (err) {
-        attempt.Error = err.message;
-        attempt.Finished = true;
-        attempt.save({Finished: true, Error: err.message})
-          .then(function () {
-            res.status(400).send({ ErrorMsg: err.message });
-          })
-          .catch(function () {
-            res.status(400).send({ ErrorMsg: err.message });
-          });
+
+        events.emit("auth/attempt:error", {
+          Id: attemptId,
+          Login: login,
+          Error: err.message,
+        });
+
+        res.status(400).send({ ErrorMsg: err.message });
+
       });
   });
 
