@@ -56,7 +56,7 @@ describe("APP_CLIENT REST API", function () {
       });
     });
 
-    describe("createAppApi <POST> with valid parameters", function () {
+    describe("createAppClient <POST> with valid parameters", function () {
 
       it("RETURNS `HTTP/1.1 403 Forbidden` WHEN `Authorization` HEADER IS NOT PROVIDED", function (done) {
         $testClient.$post(null, `/app/${appId}/clients`, clientData, function (err, res) {
@@ -73,10 +73,27 @@ describe("APP_CLIENT REST API", function () {
         });
       });
 
-      it("CREATES AN APP API", function (done) {
+      it("CREATES AN APP CLIENT", function (done) {
         $testClient.$post(authorization, `/app/${appId}/clients`, clientData, function (err, res) {
           $testClient.$get(authorization, res.headers.location, function (err, res) {
             expect(res.statusCode).toBe(200);
+            done();
+          });
+        });
+      });
+
+      it("ADDS THE CLIENT TO THE APPS LIST OF APIS", function (done) {
+        $testClient.$post(authorization, `/app/${appId}/clients`, clientData, function (err, res) {
+          let clientId = res.headers.location.split(/\//g)[4];
+          $testClient.$get(authorization, `/app/${appId}`, function (err, res) {
+            expect(res.statusCode).toBe(200);
+            expect(res.d).toEqual(jasmine.objectContaining({
+              "Clients": jasmine.arrayContaining([
+                jasmine.objectContaining({
+                  "Id": clientId
+                }),
+              ]),
+            }));
             done();
           });
         });

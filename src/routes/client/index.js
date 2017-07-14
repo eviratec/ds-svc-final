@@ -39,7 +39,7 @@ module.exports = function (api, db) {
     });
     newAppClient.save()
       .then(function (client) {
-        res.setHeader('Location', `/app/${req.body.AppId}/api/${client.get("Id")}`);
+        res.setHeader('Location', `/app/${req.body.AppId}/client/${client.get("Id")}`);
         res.sendStatus(303);
       })
       .catch(function (err) {

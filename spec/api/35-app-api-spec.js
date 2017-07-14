@@ -48,8 +48,7 @@ describe("APP_API REST API", function () {
         Name: "My Test App",
       };
       $testClient.$post(authorization, `/apps`, appData, function (err, res) {
-        let l = res.headers.location;
-        $testClient.$get(authorization, l, function (err, res) {
+        $testClient.$get(authorization, res.headers.location, function (err, res) {
           app = res.d;
           appId = app.Id;
           done();
@@ -76,10 +75,25 @@ describe("APP_API REST API", function () {
 
       it("CREATES AN APP API", function (done) {
         $testClient.$post(authorization, `/app/${appId}/apis`, apiData, function (err, res) {
-          // console.log(res.headers.location);
-          // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^",appId, `/app/${appId}/apis`);
           $testClient.$get(authorization, res.headers.location, function (err, res) {
             expect(res.statusCode).toBe(200);
+            done();
+          });
+        });
+      });
+
+      it("ADDS THE API TO THE APPS LIST OF APIS", function (done) {
+        $testClient.$post(authorization, `/app/${appId}/apis`, apiData, function (err, res) {
+          let apiId = res.headers.location.split(/\//g)[4];
+          $testClient.$get(authorization, `/app/${appId}`, function (err, res) {
+            expect(res.statusCode).toBe(200);
+            expect(res.d).toEqual(jasmine.objectContaining({
+              "Apis": jasmine.arrayContaining([
+                jasmine.objectContaining({
+                  "Id": apiId
+                }),
+              ]),
+            }));
             done();
           });
         });

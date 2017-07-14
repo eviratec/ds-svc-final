@@ -108,9 +108,55 @@ module.exports = function (api, db) {
 
   });
 
+  api.get("/app/:appId/:subTypeName/:subTypeId", requireAuthorization, function (req, res) {
+    let t = {
+      "clients": "client",
+      "apis": "api",
+      "schemas": "schema",
+    }
+    let Client = db.Client;
+    let Api = db.Api;
+    let AppSchema = db.AppSchema;
+    let subTypeName = req.subTypeName;
+    let subTypeId = req.subTypeId;
+    let appId = req.appModel.get("Id");
+    let newAppThingId = v4uuid();
+    let newAppThing;
+    switch (subTypeName) {
+      case "client":
+        db.fetchClientById(subTypeId)
+          .then(function (client) {
+            res.send(200, client);
+          })
+          .catch(function (err) {
+            console.log(err);
+            res.status(400).send({ ErrorMsg: err.message });
+          });
+        break;
+      case "api":
+        db.fetchApiById(subTypeId)
+          .then(function (api) {
+            res.send(200, api);
+          })
+          .catch(function (err) {
+            console.log(err);
+            res.status(400).send({ ErrorMsg: err.message });
+          });
+        break;
+      case "schema":
+        db.fetchSchemaById(subTypeId)
+          .then(function (schema) {
+            res.send(200, schema);
+          })
+          .catch(function (err) {
+            console.log(err);
+            res.status(400).send({ ErrorMsg: err.message });
+          });
+        break;
+    }
+  });
+
   api.post("/app/:appId/:subTypeName", requireAuthorization, function (req, res) {
-    console.log(req.appModel);
-    console.log(req.subTypeName);
     let t = {
       "clients": "client",
       "apis": "api",
@@ -188,14 +234,14 @@ module.exports = function (api, db) {
     res.status(200).send(req.apiModel);
   });
 
-  api.get("/app/:appId/client/:appClientId", requireAuthorization, function (req, res) {
+  api.get("/app/:appId/client/:clientId", requireAuthorization, function (req, res) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.sendStatus(403);
     }
-    if (req.appClientModel.get("AppId") !== req.appModel.get("Id")) {
+    if (req.clientModel.get("AppId") !== req.appModel.get("Id")) {
       return res.sendStatus(400);
     }
-    res.status(200).send(req.appClientModel);
+    res.status(200).send(req.clientModel);
   });
 
   api.get("/app/:appId/schema/:appSchemaId", requireAuthorization, function (req, res) {

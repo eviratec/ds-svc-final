@@ -9,6 +9,7 @@ module.exports = function (dataStudio) {
     "api",
     "app",
     "client",
+    "schema",
     "user",
   ];
 

@@ -10,6 +10,7 @@ module.exports = function () {
     "Hash",
     "Operation",
     "Route",
+    "Schema",
     "Token",
     "User",
   ];

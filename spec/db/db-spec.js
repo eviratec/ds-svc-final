@@ -4,9 +4,9 @@ const Db = require("../../src/db");
 describe("DATABASE", function () {
 
   const _Api_ = "Api";
-  const _AppClient_ = "AppClient";
+  const _AppClient_ = "Client";
   const _App_ = "App";
-  const _AppSchema_ = "AppSchema";
+  const _AppSchema_ = "Schema";
   const _AuthAttempt_ = "AuthAttempt";
   const _Operation_ = "Operation";
   const _OperationParameter_ = "OperationParameter";
@@ -18,8 +18,8 @@ describe("DATABASE", function () {
   const _fetchApiById_ = "fetchApiById";
   const _fetchApisByAppId_ = "fetchApisByAppId";
   const _fetchAppById_ = "fetchAppById";
-  const _fetchAppClientById_ = "fetchAppClientById";
-  const _fetchAppSchemaById_ = "fetchAppSchemaById";
+  const _fetchAppClientById_ = "fetchClientById";
+  const _fetchAppSchemaById_ = "fetchSchemaById";
   const _fetchUserById_ = "fetchUserById";
   const _fetchUserByLogin_ = "fetchUserByLogin";
   const _fetchAuthAttemptById_ = "fetchAuthAttemptById";

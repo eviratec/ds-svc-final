@@ -19,21 +19,6 @@ module.exports = function AppDb (db) {
 
   db.AppSchema = AppSchema;
 
-  let AppClient = bookshelf.Model.extend({
-    tableName: 'app_clients',
-    constructor: function() {
-      bookshelf.Model.apply(this, arguments);
-      this.on('saving', function(model, attrs, options) {
-        options.query.where('Id', '=', model.get("Id"));
-      });
-    },
-    App: function() {
-      return this.belongsTo(db.App, "AppId", "Id");
-    },
-  });
-
-  db.AppClient = AppClient;
-
   let App = bookshelf.Model.extend({
     tableName: 'apps',
     idAttribute: "Id",
@@ -50,7 +35,7 @@ module.exports = function AppDb (db) {
       return this.hasMany(db.AppSchema, "AppId");
     },
     Clients: function() {
-      return this.hasMany(db.AppClient, "AppId");
+      return this.hasMany(db.Client, "AppId");
     },
     Apis: function() {
       return this.hasMany(db.Api, "AppId");
@@ -80,17 +65,6 @@ module.exports = function AppDb (db) {
   }
 
   db.fetchAppApiById = fetchAppApiById;
-
-  function fetchAppClientById (id) {
-    return new Promise((resolve, reject) => {
-      AppClient.where({"Id": id})
-        .fetch()
-        .then(resolve)
-        .catch(reject);
-    });
-  }
-
-  db.fetchAppClientById = fetchAppClientById;
 
   function fetchAppSchemaById (id) {
     return new Promise((resolve, reject) => {

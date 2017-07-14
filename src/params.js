@@ -47,13 +47,12 @@ module.exports = function (dataStudio) {
 
     req.appModel = null;
 
-    db.fetchAppById(id)
+    db.fetchDetailedAppById(id)
       .then(function (app) {
         req.appModel = app;
         next();
       })
       .catch(function (err) {
-        console.log("FUCKFUCK");
         next();
       });
 
@@ -111,6 +110,21 @@ module.exports = function (dataStudio) {
     db.fetchApiById(id)
       .then(function (api) {
         req.apiModel = apiModel;
+        next();
+      })
+      .catch(function (err) {
+        next();
+      });
+
+  });
+
+  api.param(["appId","clientId"], function (req, res, next, id) {
+
+    req.clientModel = null;
+
+    db.fetchClientById(id)
+      .then(function (api) {
+        req.clientModel = clientModel;
         next();
       })
       .catch(function (err) {
