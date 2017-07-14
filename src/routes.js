@@ -8,6 +8,7 @@ module.exports = function (dataStudio) {
   const ROUTE_DEFINERS = [
     "api",
     "app",
+    "client",
     "user",
   ];
 

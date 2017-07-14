@@ -12,10 +12,10 @@ function requireAuthorization (req, res, next) {
 module.exports = function (api, db) {
 
   api.get("/app/:appId", requireAuthorization, function (req, res) {
-    if (null === req.app) {
+    if (null === req.appModel) {
       return res.sendStatus(404);
     }
-    res.status(200).send(req.app);
+    res.status(200).send(req.appModel);
   });
 
   api.put("/app/:appId", requireAuthorization, function (req, res) {
@@ -116,8 +116,8 @@ module.exports = function (api, db) {
       "apis": "api",
       "schemas": "schema",
     }
-    let AppClient = db.AppClient;
-    let AppApi = db.AppApi;
+    let Client = db.Client;
+    let Api = db.Api;
     let AppSchema = db.AppSchema;
     let subTypeName = req.subTypeName;
     let appId = req.appModel.get("Id");
@@ -125,7 +125,7 @@ module.exports = function (api, db) {
     let newAppThing;
     switch (subTypeName) {
       case "clients":
-        newAppThing = new AppClient({
+        newAppThing = new Client({
           Id: newAppThingId,
           AppId: appId,
           Name: req.body.Name || "NewClient",
@@ -133,7 +133,7 @@ module.exports = function (api, db) {
         });
         break;
       case "apis":
-        newAppThing = new AppApi({
+        newAppThing = new Api({
           Id: newAppThingId,
           AppId: appId,
           Name: req.body.Name || "NewApi",
@@ -178,14 +178,14 @@ module.exports = function (api, db) {
 
   });
 
-  api.get("/app/:appId/api/:appApiId", requireAuthorization, function (req, res) {
+  api.get("/app/:appId/api/:apiId", requireAuthorization, function (req, res) {
     if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
       return res.sendStatus(403);
     }
-    if (req.appApiModel.get("AppId") !== req.appModel.get("Id")) {
+    if (req.apiModel.get("AppId") !== req.appModel.get("Id")) {
       return res.sendStatus(400);
     }
-    res.status(200).send(req.appApiModel);
+    res.status(200).send(req.apiModel);
   });
 
   api.get("/app/:appId/client/:appClientId", requireAuthorization, function (req, res) {

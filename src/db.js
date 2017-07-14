@@ -6,6 +6,7 @@ module.exports = function () {
     "Api",
     "App",
     "Auth",
+    "Client",
     "Hash",
     "Operation",
     "Route",

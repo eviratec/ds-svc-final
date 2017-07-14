@@ -48,7 +48,8 @@ describe("APP_API REST API", function () {
         Name: "My Test App",
       };
       $testClient.$post(authorization, `/apps`, appData, function (err, res) {
-        $testClient.$get(authorization, res.headers.location, function (err, res) {
+        let l = res.headers.location;
+        $testClient.$get(authorization, l, function (err, res) {
           app = res.d;
           appId = app.Id;
           done();
@@ -68,14 +69,15 @@ describe("APP_API REST API", function () {
       it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
         $testClient.$post(authorization, `/app/${appId}/apis`, apiData, function (err, res) {
           expect(res.statusCode).toBe(303);
-          expect(res.headers.location).toMatch(/^\/appApi\/([a-z0-9-]{36})$/);
+          expect(res.headers.location).toMatch(/^\/app\/([a-z0-9-]{36})\/api\/([a-z0-9-]{36})$/);
           done();
         });
       });
 
       it("CREATES AN APP API", function (done) {
         $testClient.$post(authorization, `/app/${appId}/apis`, apiData, function (err, res) {
-          console.log(res.headers.location);
+          // console.log(res.headers.location);
+          // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^",appId, `/app/${appId}/apis`);
           $testClient.$get(authorization, res.headers.location, function (err, res) {
             expect(res.statusCode).toBe(200);
             done();

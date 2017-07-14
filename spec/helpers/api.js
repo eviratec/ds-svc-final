@@ -74,18 +74,21 @@
         options.headers["Authorization"] = authorization;
       }
 
-      const req = http.request(options, (res) => {
+      let req = http.request(options, function (res) {
         res.setEncoding("utf8");
         res.d = "";
-        res.on("data", (chunk) => {
+        res.on("data", function (chunk) {
           res.d += chunk;
         });
-        res.on("end", () => {
+        res.on("end", function () {
+          let d = res.d;
           if (res.d) {
             try {
               res.d = JSON.parse(res.d);
             }
-            catch (e) {}
+            catch (e) {
+              res.d = d;
+            }
           }
           cb(undefined, res);
         });

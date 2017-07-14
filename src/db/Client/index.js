@@ -4,8 +4,8 @@ module.exports = function ApiDb (db) {
 
   const bookshelf = db._bookshelf;
 
-  let Api = bookshelf.Model.extend({
-    tableName: 'app_apis',
+  let Client = bookshelf.Model.extend({
+    tableName: 'app_clients',
     constructor: function() {
       bookshelf.Model.apply(this, arguments);
       this.on('saving', function(model, attrs, options) {
@@ -15,47 +15,41 @@ module.exports = function ApiDb (db) {
     App: function() {
       return this.belongsTo(db.App, "AppId", "Id");
     },
-    Routes: function() {
-      return this.hasMany(db.Route, "ApiId");
-    },
-    Operations: function() {
-      return this.hasMany(db.Operation, "ApiId");
-    },
   });
 
-  db.Api = Api;
+  db.Client = Client;
 
-  function fetchApiById (id) {
+  function fetchClientById (id) {
     return new Promise((resolve, reject) => {
-      Api.where({"Id": id})
-        .fetch({withRelated: ["App", "Operations"]})
+      Client.where({"Id": id})
+        .fetch()
         .then(resolve)
         .catch(reject);
     });
   };
 
-  db.fetchApiById = fetchApiById;
+  db.fetchClientById = fetchClientById;
 
-  function fetchApisByAppId (appId) {
+  function fetchClientsByAppId (appId) {
     return new Promise((resolve, reject) => {
-      Api.where({"AppId": appId, "Deleted": null})
+      Client.where({"AppId": appId, "Deleted": null})
         .fetchAll()
         .then(resolve)
         .catch(reject);
     });
   }
 
-  db.fetchApisByAppId = fetchApisByAppId;
+  db.fetchClientsByAppId = fetchClientsByAppId;
 
-  function fetchApiById (id) {
+  function fetchClientById (id) {
     return new Promise((resolve, reject) => {
-      Api.where({"Id": id, "Deleted": null})
-        .fetch({withRelated: ["Routes", "Operations"]})
+      Client.where({"Id": id, "Deleted": null})
+        .fetch()
         .then(resolve)
         .catch(reject);
     });
   }
 
-  db.fetchApiById = fetchApiById;
+  db.fetchClientById = fetchClientById;
 
 };

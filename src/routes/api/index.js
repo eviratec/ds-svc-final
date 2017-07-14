@@ -10,10 +10,10 @@ function requireAuthorization (req, res, next) {
 module.exports = function (api, db) {
 
   api.get("/api/:apiId", requireAuthorization, function (req, res) {
-    if (null === req.api) {
+    if (null === req.apiModel) {
       return res.send(404);
     }
-    res.send(200, req.api);
+    res.send(200, req.apiModel);
   });
 
   api.put("/api/:apiId", requireAuthorization, function (req, res) {
@@ -24,10 +24,14 @@ module.exports = function (api, db) {
     res.send(404);
   });
 
+  api.get("/apis", requireAuthorization, function (req, res) {
+
+  });
+
   api.post("/apis", requireAuthorization, function (req, res) {
-    let AppApi = db.AppApi;
+    let Api = db.Api;
     let newAppApiId = v4uuid();
-    let newAppApi = new AppApi({
+    let newAppApi = new Api({
       Id: newAppApiId,
       AppId: req.body.AppId,
       Name: req.body.Name || "NewApi",
@@ -35,7 +39,7 @@ module.exports = function (api, db) {
     });
     newAppApi.save()
       .then(function (appApi) {
-        res.setHeader('Location', `/app/${appId}/api/${appApi.get("Id")}`);
+        res.setHeader('Location', `/app/${req.body.AppId}/api/${appApi.get("Id")}`);
         res.sendStatus(303);
       })
       .catch(function (err) {

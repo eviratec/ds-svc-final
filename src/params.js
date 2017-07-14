@@ -104,13 +104,13 @@ module.exports = function (dataStudio) {
 
   });
 
-  api.param("apiId", function (req, res, next, id) {
+  api.param(["appId","apiId"], function (req, res, next, id) {
 
-    req.api = null;
+    req.apiModel = null;
 
     db.fetchApiById(id)
       .then(function (api) {
-        req.api = api;
+        req.apiModel = apiModel;
         next();
       })
       .catch(function (err) {

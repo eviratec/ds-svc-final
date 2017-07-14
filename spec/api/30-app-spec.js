@@ -59,6 +59,16 @@ describe("APP REST API", function () {
         });
       });
 
+      it("CREATES A RESOURCE REACHABLE VIA THE URI IN THE `Location` HEADER", function (done) {
+        $testClient.$post(authorization, `/apps`, d, function (err, res) {
+          $testClient.$get(authorization, `${res.headers.location}`, function (err, res) {
+            expect(res.statusCode).toBe(200);
+            expect(res.d).toEqual(jasmine.any(Object));
+            done();
+          });
+        });
+      });
+
     });
 
   });
