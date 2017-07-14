@@ -28,7 +28,7 @@ module.exports = function ApiDb (db) {
   function fetchApiById (id) {
     return new Promise((resolve, reject) => {
       Api.where({"Id": id})
-        .fetch({withRelated: ["App", "Operations"]})
+        .fetch()
         .then(resolve)
         .catch(reject);
     });
@@ -50,7 +50,7 @@ module.exports = function ApiDb (db) {
   function fetchApiById (id) {
     return new Promise((resolve, reject) => {
       Api.where({"Id": id, "Deleted": null})
-        .fetch({withRelated: ["Routes", "Operations"]})
+        .fetch()
         .then(resolve)
         .catch(reject);
     });

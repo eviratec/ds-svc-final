@@ -43,6 +43,11 @@ module.exports = function (dataStudio) {
     next();
   });
 
+  api.param(["subTypeName", "subTypeId"], function (req, res, next, id) {
+    req.subTypeId = id;
+    next();
+  });
+
   api.param(["appId"], function (req, res, next, id) {
 
     req.appModel = null;
@@ -50,36 +55,6 @@ module.exports = function (dataStudio) {
     db.fetchDetailedAppById(id)
       .then(function (app) {
         req.appModel = app;
-        next();
-      })
-      .catch(function (err) {
-        next();
-      });
-
-  });
-
-  api.param("appClientId", function (req, res, next, id) {
-
-    req.appClientModel = null;
-
-    db.fetchAppClientById(id)
-      .then(function (appClient) {
-        req.appClientModel = appClient;
-        next();
-      })
-      .catch(function (err) {
-        next();
-      });
-
-  });
-
-  api.param("appSchemaId", function (req, res, next, id) {
-
-    req.appSchemaModel = null;
-
-    db.fetchAppSchemaById(id)
-      .then(function (appSchema) {
-        req.appSchemaModel = appSchema;
         next();
       })
       .catch(function (err) {

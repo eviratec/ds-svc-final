@@ -124,6 +124,7 @@ module.exports = function (api, db) {
     let newAppThing;
     switch (subTypeName) {
       case "client":
+      console.log("@@@@@client",subTypeId);
         db.fetchClientById(subTypeId)
           .then(function (client) {
             res.send(200, client);
@@ -134,6 +135,7 @@ module.exports = function (api, db) {
           });
         break;
       case "api":
+      console.log("@@@@@api",subTypeId);
         db.fetchApiById(subTypeId)
           .then(function (api) {
             res.send(200, api);
@@ -144,6 +146,7 @@ module.exports = function (api, db) {
           });
         break;
       case "schema":
+      console.log("@@@@@schema",subTypeId);
         db.fetchSchemaById(subTypeId)
           .then(function (schema) {
             res.send(200, schema);
