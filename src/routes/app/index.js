@@ -9,7 +9,11 @@ function requireAuthorization (req, res, next) {
   next();
 }
 
-module.exports = function (api, db) {
+module.exports = function (dataStudio) {
+
+  const api = dataStudio.expressApp;
+  const db = dataStudio.db;
+  const events = dataStudio.events;
 
   api.get("/app/:appId", requireAuthorization, function (req, res) {
     if (null === req.appModel) {

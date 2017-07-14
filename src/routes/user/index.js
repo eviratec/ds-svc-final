@@ -10,7 +10,11 @@ function requireAuthorization (req, res, next) {
   next();
 }
 
-module.exports = function (api, db) {
+module.exports = function (dataStudio) {
+
+  const api = dataStudio.expressApp;
+  const db = dataStudio.db;
+  const events = dataStudio.events;
 
   const RESERVED_LOGINS = require("../../etc/reserved.usernames.json");
 
@@ -135,6 +139,11 @@ module.exports = function (api, db) {
       Error: null,
       TokenId: null,
       Created: new Date(),
+    });
+
+    events.emit("auth/attempt", {
+      Id: attemptId,
+      Login: req.body.Login
     });
 
     function createToken (user, expiry) {

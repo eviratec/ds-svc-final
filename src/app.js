@@ -25,6 +25,7 @@ class DataStudio {
 
     this.db = require("./db")();
 
+    require("./events")(this);
     require("./params")(this);
     require("./routes")(this);
 

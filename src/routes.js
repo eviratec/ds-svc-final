@@ -2,9 +2,6 @@
 
 module.exports = function (dataStudio) {
 
-  const api = dataStudio.expressApp;
-  const db = dataStudio.db;
-
   const ROUTE_DEFINERS = [
     "api",
     "app",
@@ -14,7 +11,7 @@ module.exports = function (dataStudio) {
   ];
 
   ROUTE_DEFINERS.forEach(t => {
-    require(`./routes/${t}`)(api, db);
+    require(`./routes/${t}`)(dataStudio);
   });
 
   return this;
