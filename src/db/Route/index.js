@@ -15,11 +15,30 @@ module.exports = function OperationDb (db) {
     Api: function() {
       return this.belongsTo(db.Api, "ApiId", "Id");
     },
-    Operations: function() {
-      return this.hasMany(db.Operation, "ApiRouteId", "Id");
-    },
   });
 
   db.Route = Route;
+
+  function fetchRouteById (id) {
+    return new Promise((resolve, reject) => {
+      Route.where({"Id": id, "Deleted": null})
+        .fetch()
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  db.fetchRouteById = fetchRouteById;
+
+  function fetchRoutesByApiId (apiId) {
+    return new Promise((resolve, reject) => {
+      Route.where({"ApiId": apiId, "Deleted": null})
+        .fetchAll()
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  db.fetchRoutesByApiId = fetchRoutesByApiId;
 
 };

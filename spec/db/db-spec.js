@@ -28,6 +28,8 @@ describe("DATABASE", function () {
   const _fetchTokenByKey_ = "fetchTokenByKey";
   const _fetchOperationById_ = "fetchOperationById";
   const _fetchOperationsByApiId_ = "fetchOperationsByApiId";
+  const _fetchRouteById_ = "fetchRouteById";
+  const _fetchRoutesByApiId_ = "fetchRoutesByApiId";
 
   let db;
 
@@ -149,6 +151,18 @@ describe("DATABASE", function () {
 
       it(_fetchOperationsByApiId_, function () {
         expect(_fetchOperationsByApiId_ in db).toBe(true);
+      });
+
+    });
+
+    describe("FOR ROUTES", function () {
+
+      it(_fetchRouteById_, function () {
+        expect(_fetchRouteById_ in db).toBe(true);
+      });
+
+      it(_fetchRoutesByApiId_, function () {
+        expect(_fetchRoutesByApiId_ in db).toBe(true);
       });
 
     });
