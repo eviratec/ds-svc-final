@@ -1,8 +1,10 @@
 "use strict";
 
+const v4uuid = require("uuid/v4");
+
 function requireAuthorization (req, res, next) {
   if (!req.authorized) {
-    return res.send(403);
+    return res.sendStatus(403);
   }
   next();
 }
@@ -15,21 +17,29 @@ module.exports = function (dataStudio) {
 
   api.get("/api/:apiId", requireAuthorization, function (req, res) {
     if (null === req.apiModel) {
-      return res.send(404);
+      return res.sendStatus(404);
     }
-    res.send(200, req.apiModel);
+    db.fetchDetailedApiById(req.apiModel.get("Id"))
+      .then(function (api) {
+        res.sendStatus(200).send(api);
+      })
+      .catch(function (err) {
+        res.status(500).send({
+          ErrorMsg: err.message,
+        });
+      });
   });
 
   api.put("/api/:apiId", requireAuthorization, function (req, res) {
-    res.send(404);
+    res.sendStatus(404);
   });
 
   api.delete("/api/:apiId", requireAuthorization, function (req, res) {
-    res.send(404);
+    res.sendStatus(404);
   });
 
   api.get("/apis", requireAuthorization, function (req, res) {
-
+    res.sendStatus(200).send([]);
   });
 
   api.post("/apis", requireAuthorization, function (req, res) {
@@ -47,7 +57,87 @@ module.exports = function (dataStudio) {
         res.sendStatus(303);
       })
       .catch(function (err) {
-        res.status(400).send({ ErrorMsg: err.message });
+        res.sendStatus(400).send({ ErrorMsg: err.message });
+      });
+  });
+
+  [
+    {id: "operations", fetch: "fetchOperationsByApiId"},
+  ].forEach(x => {
+
+    let tId = x.id;
+    let tFn = x.fetch;
+
+    api.get(`/api/:apiId/${tId}`, requireAuthorization, function (req, res) {
+      let ownerUserId = req.apiModel.related("App").get("UserId");
+      if (ownerUserId !== req.authUser.get("Id")) {
+        return res.sendStatus(403);
+      }
+      db[tFn](req.apiModel.get("Id"))
+        .then(function (schemas) {
+          res.status(200).send(schemas);
+        })
+        .catch(function (err) {
+          res.status(500).send({ ErrorMsg: err.message });
+        });
+    });
+
+  });
+
+  api.get("/api/:apiId/:subTypeName/:subTypeId", requireAuthorization, function (req, res) {
+    let t = {
+      "operations": "operation",
+    }
+    let Operation = db.Operation;
+    let subTypeName = req.subTypeName;
+    let subTypeId = req.subTypeId;
+    let apiId = req.apiModel.get("Id");
+    switch (subTypeName) {
+      case "operation":
+        db.fetchOperationById(subTypeId)
+          .then(function (op) {
+            res.status(200).send(op);
+          })
+          .catch(function (err) {
+            console.log(err);
+            res.status(400).send({ ErrorMsg: err.message });
+          });
+        break;
+    }
+  });
+
+  api.post("/api/:apiId/:subTypeName", requireAuthorization, function (req, res) {
+    let t = {
+      "operations": "operation",
+    }
+    let Client = db.Client;
+    let Api = db.Api;
+    let Operation = db.Operation;
+    let subTypeName = req.subTypeName;
+    let apiId = req.apiModel.get("Id");
+    let newApiThingId = v4uuid();
+    let newApiThing;
+    switch (subTypeName) {
+      case "operations":
+        newApiThing = new Operation({
+          Id: newApiThingId,
+          ApiId: apiId,
+          Method: req.body.Method || "get",
+          Name: req.body.Name || "defaultOperation",
+          Summary: "",
+          Description: "",
+          Created: Math.floor(Date.now()/1000),
+        });
+        break;
+    }
+    newApiThing.save()
+      .then(function (apiThing) {
+        res.setHeader('Location', `/api/${apiId}/${t[subTypeName]}/${apiThing.get("Id")}`);
+        res.sendStatus(303);
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.sendStatus(400).send({ ErrorMsg: err.message });
       });
   });
 

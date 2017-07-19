@@ -3,12 +3,12 @@
 module.exports = function () {
 
   const DBS = [
+    "Operation",
     "Api",
     "App",
     "Auth",
     "Client",
     "Hash",
-    "Operation",
     "Route",
     "Schema",
     "Token",
