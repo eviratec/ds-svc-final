@@ -22,7 +22,11 @@ describe("API ROUTE", function () {
   const _ALL_APPS_ = "/apps/all";
 
   const _API_ = "/api/:apiId";
+  const _API_OPERATIONS_ = "/api/:apiId/operations";
   const _APIS_ = "/apis";
+
+  const _OPERATION_ = "/operation/:operationId";
+  const _OPERATIONS_ = "/operations";
 
   const _AUTH_ATTEMPT_ = "/auth/attempt/:authAttemptId";
   const _AUTH_ATTEMPTS_ = "/auth/attempts";
@@ -168,6 +172,30 @@ describe("API ROUTE", function () {
       });
 
       it(`${_DELETE_} ${_API_}`, function () {
+        expect(spyDelete).toHaveBeenCalledWith(_API_, _FN_, _FN_);
+      });
+
+    });
+
+    describe("FOR OPERATIONS", function () {
+
+      it(`${_POST_} ${_API_OPERATIONS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APIS_, _FN_, _FN_);
+      });
+
+      it(`${_POST_} ${_OPERATIONS_}`, function () {
+        expect(spyPost).toHaveBeenCalledWith(_APIS_, _FN_, _FN_);
+      });
+
+      it(`${_GET_} ${_OPERATION_}`, function () {
+        expect(spyGet).toHaveBeenCalledWith(_API_, _FN_, _FN_);
+      });
+
+      it(`${_PUT_} ${_OPERATION_}`, function () {
+        expect(spyPut).toHaveBeenCalledWith(_API_, _FN_, _FN_);
+      });
+
+      it(`${_DELETE_} ${_OPERATION_}`, function () {
         expect(spyDelete).toHaveBeenCalledWith(_API_, _FN_, _FN_);
       });
 
