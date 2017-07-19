@@ -134,6 +134,7 @@ module.exports = function (dataStudio) {
       case "operations":
         newApiThing = new Operation({
           Id: newApiThingId,
+          RouteId: req.body.RouteId || null,
           ApiId: apiId,
           Method: req.body.Method || "get",
           Name: req.body.Name || "defaultOperation",
