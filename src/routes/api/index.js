@@ -63,6 +63,7 @@ module.exports = function (dataStudio) {
 
   [
     {id: "operations", fetch: "fetchOperationsByApiId"},
+    {id: "routes", fetch: "fetchRoutesByApiId"},
   ].forEach(x => {
 
     let tId = x.id;
@@ -87,8 +88,8 @@ module.exports = function (dataStudio) {
   api.get("/api/:apiId/:subTypeName/:subTypeId", requireAuthorization, function (req, res) {
     let t = {
       "operations": "operation",
+      "routes": "route",
     }
-    let Operation = db.Operation;
     let subTypeName = req.subTypeName;
     let subTypeId = req.subTypeId;
     let apiId = req.apiModel.get("Id");
@@ -103,15 +104,27 @@ module.exports = function (dataStudio) {
             res.status(400).send({ ErrorMsg: err.message });
           });
         break;
+      case "route":
+        db.fetchRouteById(subTypeId)
+          .then(function (route) {
+            res.status(200).send(route);
+          })
+          .catch(function (err) {
+            console.log(err);
+            res.status(400).send({ ErrorMsg: err.message });
+          });
+        break;
     }
   });
 
   api.post("/api/:apiId/:subTypeName", requireAuthorization, function (req, res) {
     let t = {
       "operations": "operation",
+      "routes": "route",
     }
     let Client = db.Client;
     let Api = db.Api;
+    let Route = db.Route;
     let Operation = db.Operation;
     let subTypeName = req.subTypeName;
     let apiId = req.apiModel.get("Id");
@@ -126,6 +139,14 @@ module.exports = function (dataStudio) {
           Name: req.body.Name || "defaultOperation",
           Summary: "",
           Description: "",
+          Created: Math.floor(Date.now()/1000),
+        });
+        break;
+      case "routes":
+        newApiThing = new Route({
+          Id: newApiThingId,
+          ApiId: apiId,
+          Path: req.body.Path || "/default/path",
           Created: Math.floor(Date.now()/1000),
         });
         break;
