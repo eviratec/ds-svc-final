@@ -28,7 +28,6 @@ describe("DATABASE", function () {
   const _fetchTokenByKey_ = "fetchTokenByKey";
   const _fetchOperationById_ = "fetchOperationById";
   const _fetchOperationsByApiId_ = "fetchOperationsByApiId";
-  const _fetchOperationParameterById_ = "fetchOperationParameterById";
 
   let db;
 
@@ -60,10 +59,6 @@ describe("DATABASE", function () {
 
     it(_Operation_, function () {
       expect(_Operation_ in db).toBe(true);
-    });
-
-    it(_OperationParameter_, function () {
-      expect(_OperationParameter_ in db).toBe(true);
     });
 
     it(_Route_, function () {
@@ -154,10 +149,6 @@ describe("DATABASE", function () {
 
       it(_fetchOperationsByApiId_, function () {
         expect(_fetchOperationsByApiId_ in db).toBe(true);
-      });
-
-      it(_fetchOperationParameterById_, function () {
-        expect(_fetchOperationParameterById_ in db).toBe(true);
       });
 
     });

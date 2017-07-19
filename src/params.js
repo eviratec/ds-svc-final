@@ -78,13 +78,13 @@ module.exports = function (dataStudio) {
 
   });
 
-  api.param(["appId","apiId"], function (req, res, next, id) {
+  api.param("apiId", function (req, res, next, id) {
 
     req.apiModel = null;
 
-    db.fetchApiById(id)
+    db.fetchDetailedApiById(id)
       .then(function (api) {
-        req.apiModel = apiModel;
+        req.apiModel = api;
         next();
       })
       .catch(function (err) {
@@ -93,13 +93,32 @@ module.exports = function (dataStudio) {
 
   });
 
-  api.param(["appId","clientId"], function (req, res, next, id) {
+  api.param("operationId", function (req, res, next, id) {
+
+    req.operationModel = null;
+
+    db.fetchOperationById(id)
+      .then(function (op) {
+        req.operationModel = op;
+        next();
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.sendStatus(500).send({
+          ErrorMsg: `NO_OPERATION: No Operation found with ID ${id}`,
+        });
+      });
+
+  });
+
+
+  api.param("clientId", function (req, res, next, id) {
 
     req.clientModel = null;
 
     db.fetchClientById(id)
-      .then(function (api) {
-        req.clientModel = clientModel;
+      .then(function (client) {
+        req.clientModel = client;
         next();
       })
       .catch(function (err) {

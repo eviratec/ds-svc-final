@@ -16,23 +16,34 @@ module.exports = function ApiDb (db) {
       return this.belongsTo(db.App, "AppId", "Id");
     },
     Routes: function() {
-      return this.hasMany(db.Route, "ApiId");
+      return this.hasMany(db.Route, "ApiId", "Id");
     },
     Operations: function() {
-      return this.hasMany(db.Operation, "ApiId");
+      return this.hasMany(db.Operation, "ApiId", "Id");
     },
   });
 
   db.Api = Api;
 
+  function fetchDetailedApiById (id) {
+    return new Promise((resolve, reject) => {
+      Api.where({"Id": id, "Deleted": null})
+        .fetch({withRelated: ["App", "Operations"]})
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  db.fetchDetailedApiById = fetchDetailedApiById;
+
   function fetchApiById (id) {
     return new Promise((resolve, reject) => {
-      Api.where({"Id": id})
+      Api.where({"Id": id, "Deleted": null})
         .fetch()
         .then(resolve)
         .catch(reject);
     });
-  };
+  }
 
   db.fetchApiById = fetchApiById;
 
@@ -46,16 +57,5 @@ module.exports = function ApiDb (db) {
   }
 
   db.fetchApisByAppId = fetchApisByAppId;
-
-  function fetchApiById (id) {
-    return new Promise((resolve, reject) => {
-      Api.where({"Id": id, "Deleted": null})
-        .fetch()
-        .then(resolve)
-        .catch(reject);
-    });
-  }
-
-  db.fetchApiById = fetchApiById;
 
 };
