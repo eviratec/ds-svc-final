@@ -41,7 +41,6 @@ Vagrant.configure("2") do |config|
     echo "=== RESOLVING NPM DEPS ==="
     cd /vagrant
     npm install
-    npm ln -s
     echo "==== STARTING SERVICE ===="
     export DS_DB_HOST=localhost
     export DS_DB_USER=root
