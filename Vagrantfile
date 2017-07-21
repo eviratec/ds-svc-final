@@ -42,10 +42,10 @@ Vagrant.configure("2") do |config|
     cd /vagrant
     npm install
     echo "==== STARTING SERVICE ===="
-    export DS_DB_HOST=localhost
-    export DS_DB_USER=root
-    export DS_DB_PASS=dsvcdevmysql
-    export DS_DB_NAME=dsvcdev
+    echo "DS_DB_HOST=localhost" >> /etc/environment
+    echo "DS_DB_USER=root" >> /etc/environment
+    echo "DS_DB_PASS=dsvcdevmysql" >> /etc/environment
+    echo "DS_DB_NAME=dsvcdev" >> /etc/environment
     nohup npm start &
   SHELL
 end
