@@ -4,6 +4,6 @@ CREATE TABLE `auth_attempts` (
   `Finished` tinyint(4) NOT NULL,
   `Error` varchar(255) DEFAULT NULL,
   `TokenId` varchar(36) DEFAULT NULL,
-  `Created` datetime NOT NULL,
+  `Created` int(11) NOT NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
