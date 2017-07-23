@@ -54,7 +54,7 @@ describe("APP REST API", function () {
       it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
         $testClient.$post(authorization, `/apps`, d, function (err, res) {
           expect(res.statusCode).toBe(303);
-          expect(res.headers.location).toMatch(/^\/app\/([a-z0-9-]{36})$/);
+          expect(res.headers.location).toMatch(jasmine.idUrlRegexp("app"));
           done();
         });
       });

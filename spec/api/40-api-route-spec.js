@@ -80,7 +80,7 @@ describe("API_ROUTE REST API", function () {
       it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/routes`, routeData, function (err, res) {
           expect(res.statusCode).toBe(303);
-          expect(res.headers.location).toMatch(/^\/api\/([a-z0-9-]{36})\/route\/([a-z0-9-]{36})$/);
+          expect(res.headers.location).toMatch(jasmine.idUrlRegexp("api", "route"));
           done();
         });
       });
