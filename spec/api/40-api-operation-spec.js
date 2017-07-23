@@ -100,7 +100,7 @@ describe("API_OPERATION REST API", function () {
       it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
           expect(res.statusCode).toBe(303);
-          expect(res.headers.location).toMatch(jasmine.idUrlRegexp("app", "operation"));
+          expect(res.headers.location).toMatch(jasmine.idUrlRegexp("api", "operation"));
           done();
         });
       });
@@ -167,7 +167,7 @@ describe("API_OPERATION REST API", function () {
               api = res.d;
               apiId = api.Id;
               $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
-                opId = res.headers.location.split(/\//g)[4];
+                opId = res.headers.location.split(/\//g).pop();
                 opUri = res.headers.location;
                 $testClient.$get(authorization, opUri, function (err, res) {
                   if (err) done(err);

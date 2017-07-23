@@ -46,6 +46,8 @@ Vagrant.configure("2") do |config|
     echo "DS_DB_USER=root" >> /etc/environment
     echo "DS_DB_PASS=dsvcdevmysql" >> /etc/environment
     echo "DS_DB_NAME=dsvcdev" >> /etc/environment
+    echo "DS_SERVER_NAME=api.datastudio.localhost" >> /etc/environment
+    echo "DS_SERVER_PROTOCOL=http" >> /etc/environment
     nohup npm start &
   SHELL
 end
