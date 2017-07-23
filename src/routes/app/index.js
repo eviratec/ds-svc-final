@@ -48,8 +48,7 @@ module.exports = function (dataStudio) {
     App.forge(newApp)
       .save(null, {method:"insert"})
       .then(function (app) {
-        res.setHeader('Location', `/app/${newAppId}`);
-        res.sendStatus(303);
+        res.localRedirect(`/app/${newAppId}`);
       })
       .catch(function (err) {
         console.log(err);
@@ -202,8 +201,7 @@ module.exports = function (dataStudio) {
     }
     newAppThing.save()
       .then(function (appThing) {
-        res.setHeader('Location', `/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`);
-        res.sendStatus(303);
+        res.localRedirect(`/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`);
       })
       .catch(function (err) {
         res.status(400).send({ ErrorMsg: err.message });
