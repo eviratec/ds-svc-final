@@ -84,7 +84,7 @@ describe("APP_CLIENT REST API", function () {
 
       it("ADDS THE CLIENT TO THE APPS LIST OF APIS", function (done) {
         $testClient.$post(authorization, `/app/${appId}/clients`, clientData, function (err, res) {
-          let clientId = res.headers.location.split(/\//g)[4];
+          let clientId = res.headers.location.split(/\//g).pop();
           $testClient.$get(authorization, `/app/${appId}`, function (err, res) {
             expect(res.statusCode).toBe(200);
             expect(res.d).toEqual(jasmine.objectContaining({

@@ -116,7 +116,7 @@ describe("API_OPERATION REST API", function () {
 
       it("ADDS THE OPERATION TO THE APIS LIST OF OPERATIONS", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
-          let opId = res.headers.location.split(/\//g)[4];
+          let opId = res.headers.location.split(/\//g).pop();
           $testClient.$get(authorization, `/api/${apiId}/operations`, function (err, res) {
             expect(res.statusCode).toBe(200);
             expect(res.d).toEqual(jasmine.arrayContaining([
