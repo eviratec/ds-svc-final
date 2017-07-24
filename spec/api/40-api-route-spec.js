@@ -80,7 +80,7 @@ describe("API_ROUTE REST API", function () {
       it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/routes`, routeData, function (err, res) {
           expect(res.statusCode).toBe(303);
-          expect(res.headers.location).toMatch(/^\/api\/([a-z0-9-]{36})\/route\/([a-z0-9-]{36})$/);
+          expect(res.headers.location).toMatch(jasmine.idUrlRegexp("api", "route"));
           done();
         });
       });
@@ -96,7 +96,7 @@ describe("API_ROUTE REST API", function () {
 
       it("ADDS THE OPERATION TO THE APIS LIST OF OPERATIONS", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/routes`, routeData, function (err, res) {
-          let opId = res.headers.location.split(/\//g)[4];
+          let opId = res.headers.location.split(/\//g).pop();
           $testClient.$get(authorization, `/api/${apiId}/routes`, function (err, res) {
             expect(res.statusCode).toBe(200);
             expect(res.d).toEqual(jasmine.arrayContaining([

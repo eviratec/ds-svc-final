@@ -100,7 +100,7 @@ describe("API_OPERATION REST API", function () {
       it("RETURNS `HTTP/1.1 303 See Other` WHEN `Authorization` HEADER IS PROVIDED", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
           expect(res.statusCode).toBe(303);
-          expect(res.headers.location).toMatch(/^\/api\/([a-z0-9-]{36})\/operation\/([a-z0-9-]{36})$/);
+          expect(res.headers.location).toMatch(jasmine.idUrlRegexp("api", "operation"));
           done();
         });
       });
@@ -116,7 +116,7 @@ describe("API_OPERATION REST API", function () {
 
       it("ADDS THE OPERATION TO THE APIS LIST OF OPERATIONS", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
-          let opId = res.headers.location.split(/\//g)[4];
+          let opId = res.headers.location.split(/\//g).pop();
           $testClient.$get(authorization, `/api/${apiId}/operations`, function (err, res) {
             expect(res.statusCode).toBe(200);
             expect(res.d).toEqual(jasmine.arrayContaining([
@@ -167,7 +167,7 @@ describe("API_OPERATION REST API", function () {
               api = res.d;
               apiId = api.Id;
               $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
-                opId = res.headers.location.split(/\//g)[4];
+                opId = res.headers.location.split(/\//g).pop();
                 opUri = res.headers.location;
                 $testClient.$get(authorization, opUri, function (err, res) {
                   if (err) done(err);

@@ -53,8 +53,7 @@ module.exports = function (dataStudio) {
     });
     newAppApi.save()
       .then(function (appApi) {
-        res.setHeader('Location', `/app/${req.body.AppId}/api/${appApi.get("Id")}`);
-        res.sendStatus(303);
+        res.localRedirect(`/app/${req.body.AppId}/api/${appApi.get("Id")}`);
       })
       .catch(function (err) {
         res.sendStatus(400).send({ ErrorMsg: err.message });
