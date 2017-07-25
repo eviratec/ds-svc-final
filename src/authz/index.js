@@ -23,7 +23,8 @@ module.exports = function (db) {
       return new Promise((resolve, reject) => {
         getResourceByUri(ResourceUri)
           .then(function (resource) {
-            if (OwnerId === resource.related("Owner").get("Id")) {
+            resource = resource.at(0);
+            if (OwnerId === resource.related("Owner").get("OwnerId")) {
               return resolve(resource.get("Uri"));
             }
             reject(new Error("Verification Failed"));
@@ -36,20 +37,22 @@ module.exports = function (db) {
   };
 
   function createResourceOwner (ResourceId, OwnerId) {
-    return db.ResourceOwner.forge({
+    let res = new db.ResourceOwner({
       Id: v4uuid(),
       ResourceId: ResourceId,
       OwnerId: OwnerId,
       Created: Date.now(),
-    }).save();
+    });
+    return res.save();
   }
 
   function createResource (ResourceUri) {
-    return db.Resource.forge({
+    let res = new db.Resource({
       Id: v4uuid(),
       Uri: ResourceUri,
       Created: Date.now(),
-    }).save();
+    });
+    return res.save();
   }
 
   function getResourceByUri (uri) {

@@ -74,32 +74,37 @@
         options.headers["Authorization"] = authorization;
       }
 
-      let req = http.request(options, function (res) {
-        res.setEncoding("utf8");
-        res.d = "";
-        res.on("data", function (chunk) {
-          res.d += chunk;
-        });
-        res.on("end", function () {
-          let d = res.d;
-          if (res.d) {
-            try {
-              res.d = JSON.parse(res.d);
-            }
-            catch (e) {
-              res.d = d;
-            }
-          }
-          cb(undefined, res);
-        });
-      });
+      setTimeout(() => {
 
-      req.on("error", (e) => {
-        console.error(`problem with request: ${e.message}`);
-        cb(e);
-      });
+        let req = http.request(options, function (res) {
+          res.setEncoding("utf8");
+          res.d = "";
+          res.on("data", function (chunk) {
+            res.d += chunk;
+          });
+          res.on("end", function () {
+            let d = res.d;
+            if (res.d) {
+              try {
+                res.d = JSON.parse(res.d);
+              }
+              catch (e) {
+                res.d = d;
+              }
+            }
+            cb(undefined, res);
+          });
+        });
 
-      req.end();
+        req.on("error", (e) => {
+          console.error(`problem with request: ${e.message}`);
+          cb(e);
+        });
+
+        req.end();
+
+      }, 50);
+      
     }
 
     $post (authorization, path, data, cb) {

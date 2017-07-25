@@ -114,12 +114,18 @@ module.exports = function (dataStudio) {
       if (ownerUserId !== req.authUser.get("Id")) {
         return res.sendStatus(403);
       }
-      db[tFn](req.apiModel.get("Id"))
-        .then(function (schemas) {
-          res.status(200).send(schemas);
+      authz.verifyOwnership(req.path.split(/\//g).slice(0,3).join("/"), req.authUser.get("Id"))
+        .then(function () {
+          db[tFn](req.apiModel.get("Id"))
+            .then(function (schemas) {
+              res.status(200).send(schemas);
+            })
+            .catch(function (err) {
+              res.status(500).send({ ErrorMsg: err.message });
+            });
         })
         .catch(function (err) {
-          res.status(500).send({ ErrorMsg: err.message });
+          res.status(404).send();
         });
     });
 

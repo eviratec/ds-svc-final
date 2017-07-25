@@ -13,7 +13,7 @@ module.exports = function ResourceDb (db) {
       });
     },
     Owner: function() {
-      return this.belongsTo(db.ResourceOwner, "Id", "ResourceId");
+      return this.hasOne(db.ResourceOwner, "ResourceId", "Id");
     },
   });
 
@@ -33,7 +33,7 @@ module.exports = function ResourceDb (db) {
   function fetchResourceByUri (uri) {
     return new Promise((resolve, reject) => {
       Resource.where({"Uri": uri})
-        .fetch({withRelated: ["Owner"]})
+        .fetchAll({withRelated: ["Owner"]})
         .then(resolve)
         .catch(reject);
     });
