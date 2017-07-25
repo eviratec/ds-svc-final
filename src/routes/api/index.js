@@ -37,6 +37,7 @@ module.exports = function (dataStudio) {
   const api = dataStudio.expressApp;
   const db = dataStudio.db;
   const events = dataStudio.events;
+  const authz = dataStudio.authz;
 
   api.get("/api/:apiId", requireAuthorization, function (req, res) {
     if (null === req.apiModel) {
@@ -136,7 +137,13 @@ module.exports = function (dataStudio) {
       case "operation":
         db.fetchOperationById(subTypeId)
           .then(function (op) {
-            res.status(200).send(op);
+            authz.verifyOwnership(req.path, req.authUser.get("Id"))
+              .then(function () {
+                res.status(200).send(op);
+              })
+              .catch(function (err) {
+                res.status(404).send();
+              });
           })
           .catch(function (err) {
             console.log(err);

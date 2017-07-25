@@ -13,14 +13,13 @@ module.exports = function ResourceOwnerDb (db) {
       });
     },
     Resource: function() {
-      return this.hasOne(db.Resource, "Id", "ResourceOwnerId");
+      return this.belongsTo(db.Resource, "ResourceId", "Id");
     },
   });
 
   db.ResourceOwner = ResourceOwner;
 
-  function fetchResourceOwnerById (id, opts) {
-    opts = opts || {};
+  function fetchResourceOwnerById (id) {
     return new Promise((resolve, reject) => {
       ResourceOwner.where({"Id": id})
         .fetch({withRelated: ["Resource"]})

@@ -23,7 +23,7 @@ module.exports = function (db) {
       return new Promise((resolve, reject) => {
         getResourceByUri(ResourceUri)
           .then(function (resource) {
-            if (OwnerId === resource.get("OwnerId")) {
+            if (OwnerId === resource.related("Owner").get("Id")) {
               return resolve(resource.get("Uri"));
             }
             reject(new Error("Verification Failed"));

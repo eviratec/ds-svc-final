@@ -19,8 +19,7 @@ module.exports = function ResourceDb (db) {
 
   db.Resource = Resource;
 
-  function fetchResourceById (id, opts) {
-    opts = opts || {};
+  function fetchResourceById (id) {
     return new Promise((resolve, reject) => {
       Resource.where({"Id": id})
         .fetch({withRelated: ["Owner"]})
@@ -32,7 +31,6 @@ module.exports = function ResourceDb (db) {
   db.fetchResourceById = fetchResourceById;
 
   function fetchResourceByUri (uri) {
-    opts = opts || {};
     return new Promise((resolve, reject) => {
       Resource.where({"Uri": uri})
         .fetch({withRelated: ["Owner"]})

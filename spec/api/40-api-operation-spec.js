@@ -107,10 +107,14 @@ describe("API_OPERATION REST API", function () {
 
       it("CREATES AN API Operation", function (done) {
         $testClient.$post(authorization, `/api/${apiId}/operations`, opData, function (err, res) {
-          $testClient.$get(authorization, res.headers.location, function (err, res) {
-            expect(res.statusCode).toBe(200);
-            done();
-          });
+          setTimeout(function () {
+
+            $testClient.$get(authorization, res.headers.location, function (err, res) {
+              expect(res.statusCode).toBe(200);
+              done();
+            });
+
+          }, 500);
         });
       });
 
@@ -209,9 +213,9 @@ describe("API_OPERATION REST API", function () {
           expect(altApiResponse.statusCode).toBe(404);
         });
 
-        it("should *not* return any content other than the word 'Forbidden'", function () {
-          expect(altApiResponse.d).toBe("Forbidden");
-          expect(altApiResponse.headers["content-length"]).toBe("9");
+        it("should *not* return any content", function () {
+          expect(altApiResponse.d).toBe("");
+          expect(altApiResponse.headers["content-length"]).toBe("0");
         });
 
       });
