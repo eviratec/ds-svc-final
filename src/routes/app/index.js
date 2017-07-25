@@ -230,6 +230,7 @@ module.exports = function (dataStudio) {
       .then(function (appThing) {
         let uri = `/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`;
         events.emit("resource:created", uri, req.authUser.get("Id"));
+        events.emit("resource:created", `/${t[subTypeName]}/${appThing.get("Id")}`, req.authUser.get("Id"));
         res.localRedirect(uri);
       })
       .catch(function (err) {

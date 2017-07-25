@@ -39,6 +39,10 @@ module.exports = function (dataStudio) {
 
   events.addListener("resource:created", function (uri, createdByUserId) {
     dataStudio.authz.registerOwnership(uri, createdByUserId);
+    if (uri.split(/\//g).length !== 5) {
+      return;
+    }
+    dataStudio.authz.registerOwnership("/"+uri.split(/\//g).slice(3,2).join("/"), createdByUserId);
   });
 
 }
