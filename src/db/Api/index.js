@@ -36,10 +36,11 @@ module.exports = function ApiDb (db) {
 
   db.fetchDetailedApiById = fetchDetailedApiById;
 
-  function fetchApiById (id) {
+  function fetchApiById (id, opts) {
+    opts = opts || {};
     return new Promise((resolve, reject) => {
       Api.where({"Id": id, "Deleted": null})
-        .fetch()
+        .fetch(opts)
         .then(resolve)
         .catch(reject);
     });
