@@ -48,7 +48,9 @@ module.exports = function (dataStudio) {
     App.forge(newApp)
       .save(null, {method:"insert"})
       .then(function (app) {
-        res.localRedirect(`/app/${newAppId}`);
+        let uri = `/app/${newAppId}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         console.log(err);
@@ -201,7 +203,9 @@ module.exports = function (dataStudio) {
     }
     newAppThing.save()
       .then(function (appThing) {
-        res.localRedirect(`/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`);
+        let uri = `/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         res.status(400).send({ ErrorMsg: err.message });

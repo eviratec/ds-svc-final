@@ -91,7 +91,9 @@ module.exports = function (dataStudio) {
     });
     newAppApi.save()
       .then(function (appApi) {
-        res.localRedirect(`/app/${req.body.AppId}/api/${appApi.get("Id")}`);
+        let uri = `/app/${req.body.AppId}/api/${appApi.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         res.sendStatus(400).send({ ErrorMsg: err.message });
@@ -191,8 +193,9 @@ module.exports = function (dataStudio) {
     }
     newApiThing.save()
       .then(function (apiThing) {
-        res.setHeader('Location', `/api/${apiId}/${t[subTypeName]}/${apiThing.get("Id")}`);
-        res.sendStatus(303);
+        let uri = `/api/${apiId}/${t[subTypeName]}/${apiThing.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         console.log(err);

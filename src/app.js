@@ -48,6 +48,7 @@ class DataStudio {
     });
 
     this.db = require("./db")();
+    this.authz = require("./authz")(this.db);
 
     require("./events")(this);
     require("./params")(this);

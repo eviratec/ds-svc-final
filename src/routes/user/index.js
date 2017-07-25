@@ -156,7 +156,8 @@ module.exports = function (dataStudio) {
 
         createToken(user, 86400)
           .then(function (token) {
-            res.localRedirect(`/auth/attempt/${attemptId}`);
+            let uri = `/auth/attempt/${attemptId}`;
+            res.localRedirect(uri);
           })
           .catch(function (err) {
             console.log(err);

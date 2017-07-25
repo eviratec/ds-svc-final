@@ -37,4 +37,8 @@ module.exports = function (dataStudio) {
     }).save();
   });
 
+  events.addListener("resource:created", function (uri, createdByUserId) {
+    dataStudio.authz.registerOwnership(uri, createdByUserId);
+  });
+
 }

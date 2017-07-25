@@ -43,7 +43,9 @@ module.exports = function (dataStudio) {
     });
     newAppSchema.save()
       .then(function (schema) {
-        res.localRedirect(`/app/${req.body.AppId}/schema/${schema.get("Id")}`);
+        let uri = `/app/${req.body.AppId}/schema/${schema.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         res.status(400).send({ ErrorMsg: err.message });
