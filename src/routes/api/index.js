@@ -9,6 +9,29 @@ function requireAuthorization (req, res, next) {
   next();
 }
 
+function apiToSchema (api) {
+  let schema = {};
+  let routePaths = {};
+  let operations = api.related("Operations");
+  let routes = api.related("Routes");
+  routes.forEach(route => {
+    let path = route.get("Path");
+    schema[path] = {};
+    routePaths[route.get("Id")] = path;
+  });
+  operations.forEach(operation => {
+    let targetPath = routePaths[operation.get("RouteId")];
+    let pathExists = targetPath in schema;
+    if (!pathExists) {
+      return;
+    }
+    schema[targetPath][operation.get("Method")] = {
+      operationId: operation.get("Name"),
+    };
+  });
+  return schema;
+}
+
 module.exports = function (dataStudio) {
 
   const api = dataStudio.expressApp;
@@ -22,6 +45,21 @@ module.exports = function (dataStudio) {
     db.fetchDetailedApiById(req.apiModel.get("Id"))
       .then(function (api) {
         res.sendStatus(200).send(api);
+      })
+      .catch(function (err) {
+        res.status(500).send({
+          ErrorMsg: err.message,
+        });
+      });
+  });
+
+  api.get("/api/:apiId/schema", requireAuthorization, function (req, res) {
+    if (null === req.apiModel) {
+      return res.sendStatus(404);
+    }
+    db.fetchDetailedApiById(req.apiModel.get("Id"))
+      .then(function (api) {
+        res.status(200).send(apiToSchema(api));
       })
       .catch(function (err) {
         res.status(500).send({

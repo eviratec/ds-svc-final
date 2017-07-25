@@ -28,7 +28,7 @@ module.exports = function ApiDb (db) {
   function fetchDetailedApiById (id) {
     return new Promise((resolve, reject) => {
       Api.where({"Id": id, "Deleted": null})
-        .fetch({withRelated: ["App", "Operations", "Routes"]})
+        .fetch({withRelated: ["Operations", "Routes"]})
         .then(resolve)
         .catch(reject);
     });
