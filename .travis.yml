@@ -24,7 +24,7 @@ before_script:
 script:
   - npm test
 
-sudo: false
+sudo: required
 
 git:
   depth: 10
