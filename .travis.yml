@@ -14,8 +14,8 @@ before_install:
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - cat /vagrant/src/sql/*.sql | mysql -h localhost -u travis datastudio
-  - cat /vagrant/src/sql/data/*.sql | mysql -h localhost -u travis datastudio
+  - cat src/sql/*.sql | mysql -h localhost -u travis datastudio
+  - cat src/sql/data/*.sql | mysql -h localhost -u travis datastudio
 
 script:
   - npm test
