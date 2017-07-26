@@ -1,0 +1,30 @@
+language: node_js
+node_js:
+  - "7"
+
+before_install:
+  - sudo apt-get update -qq
+  - debconf-set-selections <<< 'mysql-server mysql-server/root_password password dsvcdevmysql'
+  - debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password dsvcdevmysql'
+  - sudo apt-get -y install -qq mysql-server mysql-client
+  - echo "DS_DB_HOST=localhost" >> /etc/environment
+  - echo "DS_DB_USER=root" >> /etc/environment
+  - echo "DS_DB_PASS=dsvcdevmysql" >> /etc/environment
+  - echo "DS_DB_NAME=dsvcdev" >> /etc/environment
+  - echo "DS_SERVER_NAME=api.datastudio.localhost" >> /etc/environment
+  - echo "DS_SERVER_PROTOCOL=http" >> /etc/environment
+
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - mysql -h localhost -u root -pdsvcdevmysql < /vagrant/src/sql/setup/createDb.sql
+  - cat /vagrant/src/sql/*.sql | mysql -h localhost -u root -pdsvcdevmysql dsvcdev
+  - cat /vagrant/src/sql/data/*.sql | mysql -h localhost -u root -pdsvcdevmysql dsvcdev
+
+script:
+  - npm test
+
+sudo: false
+
+git:
+  depth: 10
