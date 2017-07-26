@@ -31,7 +31,9 @@ module.exports = function (db) {
      *     // success
      *   })
      *   .catch(function (error) {
-     *     // error
+     *     if (authz.RESOURCE_URI_REGISTERED === error.message) {
+     *       // Resource URI already registered
+     *     }
      *   });
      * ```
      *
@@ -41,6 +43,7 @@ module.exports = function (db) {
      */
     registerOwnership: function registerOwnership (ResourceUri, OwnerId) {
       return new Promise((resolve, reject) => {
+        ResourceUri = ResourceUri.toLowerCase();
         ifUnregistered(ResourceUri)
           .then(function () {
             let resourceId;
@@ -54,8 +57,11 @@ module.exports = function (db) {
               })
               .catch(reject);
           })
-          .catch(function () {
-
+          .catch(function (error) {
+            if (RESOURCE_URI_REGISTERED === error) {
+              return reject(new Error(RESOURCE_URI_REGISTERED));
+            }
+            reject(error);
           });
       });
     },
@@ -87,6 +93,7 @@ module.exports = function (db) {
      */
     verifyOwnership: function verifyOwnership (ResourceUri, OwnerId) {
       return new Promise((resolve, reject) => {
+        ResourceUri = ResourceUri.toLowerCase();
         getResourceByUri(ResourceUri)
           .then(function (resource) {
             resource = resource.at(0);
@@ -141,7 +148,7 @@ module.exports = function (db) {
           if (0 === resource.length) {
             return resolve();
           }
-          reject(new Error(RESOURCE_URI_REGISTERED));
+          reject(RESOURCE_URI_REGISTERED);
         })
         .catch(reject);
     });
