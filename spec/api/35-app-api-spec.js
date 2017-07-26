@@ -154,7 +154,10 @@ describe("APP_API REST API", function () {
       });
     });
 
-    describe("getApiSchema <GET> with valid parameters", function () {
+    /**
+     * @todo getApiSchema test
+     */
+    xdescribe("getApiSchema <GET> with valid parameters", function () {
 
       it("RETURNS `HTTP/1.1 403 Forbidden` WHEN `Authorization` HEADER IS NOT PROVIDED", function (done) {
         $testClient.$get(null, `/api/${apiId}/schema`, function (err, res) {
