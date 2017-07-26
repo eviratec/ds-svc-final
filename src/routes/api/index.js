@@ -9,11 +9,35 @@ function requireAuthorization (req, res, next) {
   next();
 }
 
+function apiToSchema (api) {
+  let schema = {};
+  let routePaths = {};
+  let operations = api.related("Operations");
+  let routes = api.related("Routes");
+  routes.forEach(route => {
+    let path = route.get("Path");
+    schema[path] = {};
+    routePaths[route.get("Id")] = path;
+  });
+  operations.forEach(operation => {
+    let targetPath = routePaths[operation.get("RouteId")];
+    let pathExists = targetPath in schema;
+    if (!pathExists) {
+      return;
+    }
+    schema[targetPath][operation.get("Method")] = {
+      operationId: operation.get("Name"),
+    };
+  });
+  return schema;
+}
+
 module.exports = function (dataStudio) {
 
   const api = dataStudio.expressApp;
   const db = dataStudio.db;
   const events = dataStudio.events;
+  const authz = dataStudio.authz;
 
   api.get("/api/:apiId", requireAuthorization, function (req, res) {
     if (null === req.apiModel) {
@@ -27,6 +51,28 @@ module.exports = function (dataStudio) {
         res.status(500).send({
           ErrorMsg: err.message,
         });
+      });
+  });
+
+  api.get("/api/:apiId/schema", requireAuthorization, function (req, res) {
+    if (null === req.apiModel) {
+      return res.sendStatus(404);
+    }
+    let apiId = req.apiModel.get("Id");
+    authz.verifyOwnership(`/api/${apiId}`, req.authUser.get("Id"))
+      .then(function () {
+        db.fetchDetailedApiById(req.apiModel.get("Id"))
+          .then(function (api) {
+            res.status(200).send(apiToSchema(api));
+          })
+          .catch(function (err) {
+            res.status(500).send({
+              ErrorMsg: err.message,
+            });
+          });
+      })
+      .catch(function () {
+        res.sendStatus(404);
       });
   });
 
@@ -53,7 +99,9 @@ module.exports = function (dataStudio) {
     });
     newAppApi.save()
       .then(function (appApi) {
-        res.localRedirect(`/app/${req.body.AppId}/api/${appApi.get("Id")}`);
+        let uri = `/app/${req.body.AppId}/api/${appApi.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         res.sendStatus(400).send({ ErrorMsg: err.message });
@@ -73,12 +121,18 @@ module.exports = function (dataStudio) {
       if (ownerUserId !== req.authUser.get("Id")) {
         return res.sendStatus(403);
       }
-      db[tFn](req.apiModel.get("Id"))
-        .then(function (schemas) {
-          res.status(200).send(schemas);
+      authz.verifyOwnership(req.path.split(/\//g).slice(0,3).join("/"), req.authUser.get("Id"))
+        .then(function () {
+          db[tFn](req.apiModel.get("Id"))
+            .then(function (schemas) {
+              res.status(200).send(schemas);
+            })
+            .catch(function (err) {
+              res.status(500).send({ ErrorMsg: err.message });
+            });
         })
         .catch(function (err) {
-          res.status(500).send({ ErrorMsg: err.message });
+          res.status(404).send();
         });
     });
 
@@ -96,7 +150,13 @@ module.exports = function (dataStudio) {
       case "operation":
         db.fetchOperationById(subTypeId)
           .then(function (op) {
-            res.status(200).send(op);
+            authz.verifyOwnership(req.path, req.authUser.get("Id"))
+              .then(function () {
+                res.status(200).send(op);
+              })
+              .catch(function (err) {
+                res.status(404).send();
+              });
           })
           .catch(function (err) {
             console.log(err);
@@ -153,8 +213,9 @@ module.exports = function (dataStudio) {
     }
     newApiThing.save()
       .then(function (apiThing) {
-        res.setHeader('Location', `/api/${apiId}/${t[subTypeName]}/${apiThing.get("Id")}`);
-        res.sendStatus(303);
+        let uri = `/api/${apiId}/${t[subTypeName]}/${apiThing.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         console.log(err);

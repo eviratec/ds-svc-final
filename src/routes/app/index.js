@@ -14,12 +14,19 @@ module.exports = function (dataStudio) {
   const api = dataStudio.expressApp;
   const db = dataStudio.db;
   const events = dataStudio.events;
+  const authz = dataStudio.authz;
 
   api.get("/app/:appId", requireAuthorization, function (req, res) {
     if (null === req.appModel) {
       return res.sendStatus(404);
     }
-    res.status(200).send(req.appModel);
+    authz.verifyOwnership(req.path, req.authUser.get("Id"))
+      .then(function () {
+        res.status(200).send(req.appModel);
+      })
+      .catch(function (err) {
+        res.sendStatus(404);
+      });
   });
 
   api.put("/app/:appId", requireAuthorization, function (req, res) {
@@ -48,7 +55,9 @@ module.exports = function (dataStudio) {
     App.forge(newApp)
       .save(null, {method:"insert"})
       .then(function (app) {
-        res.localRedirect(`/app/${newAppId}`);
+        let uri = `/app/${newAppId}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         console.log(err);
@@ -129,7 +138,13 @@ module.exports = function (dataStudio) {
       case "client":
         db.fetchClientById(subTypeId)
           .then(function (client) {
-            res.status(200).send(client);
+            authz.verifyOwnership(req.path, req.authUser.get("Id"))
+              .then(function () {
+                res.status(200).send(client);
+              })
+              .catch(function (err) {
+                res.status(404).send();
+              });
           })
           .catch(function (err) {
             console.log(err);
@@ -139,7 +154,13 @@ module.exports = function (dataStudio) {
       case "api":
         db.fetchApiById(subTypeId)
           .then(function (api) {
-            res.status(200).send(api);
+            authz.verifyOwnership(req.path, req.authUser.get("Id"))
+              .then(function () {
+                res.status(200).send(api);
+              })
+              .catch(function (err) {
+                res.status(404).send();
+              });
           })
           .catch(function (err) {
             console.log(err);
@@ -149,7 +170,13 @@ module.exports = function (dataStudio) {
       case "schema":
         db.fetchSchemaById(subTypeId)
           .then(function (schema) {
-            res.send(200, schema);
+            authz.verifyOwnership(req.path, req.authUser.get("Id"))
+              .then(function () {
+                res.status(200).send(schema);
+              })
+              .catch(function (err) {
+                res.status(404).send();
+              });
           })
           .catch(function (err) {
             console.log(err);
@@ -201,7 +228,10 @@ module.exports = function (dataStudio) {
     }
     newAppThing.save()
       .then(function (appThing) {
-        res.localRedirect(`/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`);
+        let uri = `/app/${appId}/${t[subTypeName]}/${appThing.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        events.emit("resource:created", `/${t[subTypeName]}/${appThing.get("Id")}`, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         res.status(400).send({ ErrorMsg: err.message });
@@ -209,21 +239,20 @@ module.exports = function (dataStudio) {
   });
 
   api.delete("/app/:appId/schema/:schemaId", requireAuthorization, function (req, res) {
-    if (req.appModel.get("UserId") !== req.authUser.get("Id")) {
-      return res.sendStatus(403);
-    }
-    if (req.appSchemaModel.get("AppId") !== req.appModel.get("Id")) {
-      return res.sendStatus(400);
-    }
-    req.appSchemaModel.save({"Deleted": Math.floor(Date.now()/1000)}, {patch: true})
+    authz.verifyOwnership(req.path, req.authUser.get("Id"))
       .then(function () {
-        res.sendStatus(204);
+        req.appSchemaModel.save({"Deleted": Math.floor(Date.now()/1000)}, {patch: true})
+          .then(function () {
+            res.sendStatus(204);
+          })
+          .catch(function (err) {
+            console.log(err);
+            res.sendStatus(500);
+          });
       })
       .catch(function (err) {
-        console.log(err);
-        res.sendStatus(500);
+        res.status(400).send();
       });
-
   });
 
   api.get("/app/:appId/api/:apiId", requireAuthorization, function (req, res) {

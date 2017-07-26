@@ -82,7 +82,7 @@ module.exports = function (dataStudio) {
 
     req.apiModel = null;
 
-    db.fetchDetailedApiById(id)
+    db.fetchApiById(id, { withRelated: ["App"] })
       .then(function (api) {
         req.apiModel = api;
         next();

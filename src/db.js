@@ -9,6 +9,8 @@ module.exports = function () {
     "Auth",
     "Client",
     "Hash",
+    "ResourceOwner",
+    "Resource",
     "Route",
     "Schema",
     "Token",

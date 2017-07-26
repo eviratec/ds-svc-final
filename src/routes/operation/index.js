@@ -49,7 +49,9 @@ module.exports = function (dataStudio) {
     });
     newApiOperation.save()
       .then(function (op) {
-        res.localRedirect(`/api/${req.body.ApiId}/operation/${op.get("Id")}`);
+        let uri = `/api/${req.body.ApiId}/operation/${op.get("Id")}`;
+        events.emit("resource:created", uri, req.authUser.get("Id"));
+        res.localRedirect(uri);
       })
       .catch(function (err) {
         res.status(400).send({ ErrorMsg: err.message });
