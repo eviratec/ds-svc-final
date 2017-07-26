@@ -3,12 +3,7 @@ node_js:
   - "7"
 
 env:
-  - DS_DB_HOST=localhost
-  - DS_DB_USER=travis
-  - DS_DB_PASS=
-  - DS_DB_NAME=datastudio
-  - DS_SERVER_NAME=api.datastudio.localhost
-  - DS_SERVER_PROTOCOL=http
+  - DS_DB_HOST=localhost DS_DB_USER=travis DS_DB_PASS= DS_DB_NAME=datastudio DS_SERVER_NAME=localhost DS_SERVER_PROTOCOL=http
 
 services:
   - mysql
