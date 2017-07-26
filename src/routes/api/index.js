@@ -58,14 +58,21 @@ module.exports = function (dataStudio) {
     if (null === req.apiModel) {
       return res.sendStatus(404);
     }
-    db.fetchDetailedApiById(req.apiModel.get("Id"))
-      .then(function (api) {
-        res.status(200).send(apiToSchema(api));
+    let apiId = req.apiModel.get("Id");
+    authz.verifyOwnership(`/api/${apiId}`, req.authUser.get("Id"))
+      .then(function () {
+        db.fetchDetailedApiById(req.apiModel.get("Id"))
+          .then(function (api) {
+            res.status(200).send(apiToSchema(api));
+          })
+          .catch(function (err) {
+            res.status(500).send({
+              ErrorMsg: err.message,
+            });
+          });
       })
-      .catch(function (err) {
-        res.status(500).send({
-          ErrorMsg: err.message,
-        });
+      .catch(function () {
+        res.sendStatus(404);
       });
   });
 

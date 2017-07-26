@@ -4,21 +4,87 @@ module.exports = function (db) {
 
   const v4uuid = require("uuid/v4");
 
+  const VERIFICATION_FAILED = "Verification Failed";
+  const VERIFICATION_ERROR = "Unable to perform verification";
+  const RESOURCE_URI_REGISTERED = "Resource Uri Registered"
+
   return {
+
+    VERIFICATION_FAILED: VERIFICATION_FAILED,
+
+    VERIFICATION_ERROR: VERIFICATION_ERROR,
+
+    RESOURCE_URI_REGISTERED: RESOURCE_URI_REGISTERED,
+
+    /**
+     * authz.registerOwnership()
+     *
+     * Register a `ResourceUri` as owned by `OwnerId`
+     *
+     * # Example Usage
+     *
+     * ```javascript
+     * let uri = "/user/123/profile";
+     * let ownerId = "USER_123";
+     * authz.registerOwnership(uri, ownerId)
+     *   .then(function () {
+     *     // success
+     *   })
+     *   .catch(function (error) {
+     *     // error
+     *   });
+     * ```
+     *
+     * @param  {String} ResourceUri [description]
+     * @param  {String} OwnerId [description]
+     * @return {Promise} [description]
+     */
     registerOwnership: function registerOwnership (ResourceUri, OwnerId) {
       return new Promise((resolve, reject) => {
-        let resourceId;
-        createResource(ResourceUri)
-          .then(function (resource) {
-            resourceId = resource.get("Id");
-            return createResourceOwner(resourceId, OwnerId);
-          })
+        ifUnregistered(ResourceUri)
           .then(function () {
-            resolve(resourceId);
+            let resourceId;
+            createResource(ResourceUri)
+              .then(function (resource) {
+                resourceId = resource.get("Id");
+                return createResourceOwner(resourceId, OwnerId);
+              })
+              .then(function () {
+                resolve(resourceId);
+              })
+              .catch(reject);
           })
-          .catch(reject);
-        });
+          .catch(function () {
+
+          });
+      });
     },
+
+    /**
+     * authz.verifyOwnership()
+     *
+     * Verify a `ResourceUri` is owned by `OwnerId`
+     *
+     * # Example Usage
+     *
+     * ```javascript
+     * let uri = "/user/123/profile";
+     * let ownerId = "USER_123";
+     * authz.verifyOwnership(uri, ownerId)
+     *   .then(function () {
+     *     // success
+     *   })
+     *   .catch(function (error) {
+     *     if (authz.VERIFICATION_FAILED === error.message) {
+     *       // Verification failed
+     *     }
+     *   });
+     * ```
+     *
+     * @param  {String} ResourceUri [description]
+     * @param  {String} OwnerId [description]
+     * @return {Promise} [description]
+     */
     verifyOwnership: function verifyOwnership (ResourceUri, OwnerId) {
       return new Promise((resolve, reject) => {
         getResourceByUri(ResourceUri)
@@ -27,13 +93,14 @@ module.exports = function (db) {
             if (OwnerId === resource.related("Owner").get("OwnerId")) {
               return resolve(resource.get("Uri"));
             }
-            reject(new Error("Verification Failed"));
+            reject(new Error(VERIFICATION_FAILED));
           })
           .catch(function (err) {
-            reject(new Error("Verification Failed: " + err.message));
+            reject(new Error(VERIFICATION_ERROR + ": " + err.message));
           });
       });
     },
+
   };
 
   function createResourceOwner (ResourceId, OwnerId) {
@@ -64,6 +131,19 @@ module.exports = function (db) {
         .catch(function (err) {
           console.log(err);
         });
+    });
+  }
+
+  function ifUnregistered (ResourceUri) {
+    return new Promise((resolve, reject) => {
+      getResourceByUri(ResourceUri)
+        .then(function (resource) {
+          if (0 === resource.length) {
+            return resolve();
+          }
+          reject(new Error(RESOURCE_URI_REGISTERED));
+        })
+        .catch(reject);
     });
   }
 
